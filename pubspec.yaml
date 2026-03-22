@@ -1,0 +1,29 @@
+---
+dependencies:
+  animated_bottom_navigation_bar: ^1.4.0
+  cupertino_icons: ^1.0.8
+  device_info_plus: ^9.0.0
+  flutter:
+    sdk: flutter
+  flutter_secure_storage: ^9.2.4
+  geolocator: ^10.1.0
+  get: ^4.6.6
+  get_storage: ^2.1.1
+  intl: ^0.20.2
+  local_auth: ^2.3.0
+  path_provider: ^2.1.2
+  swipeable_button_view: ^0.0.2
+description: A new Flutter project.
+dev_dependencies:
+  flutter_lints: ^5.0.0
+  flutter_test:
+    sdk: flutter
+environment:
+  sdk: ^3.6.0
+flutter:
+  assets:
+    - assets/
+  uses-material-design: true
+name: ama
+publish_to: none
+version: 1.0.0+1
