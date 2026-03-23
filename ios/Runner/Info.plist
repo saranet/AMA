@@ -56,5 +56,13 @@
 		<string>_http._tcp</string>
 		<string>_https._tcp</string>
 	</array>
+	<key>NSFaceIDUsageDescription</key>
+	<string>This app uses Face ID to securely log in users.</string>
+
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs your location to show nearby emergencies and alerts.</string>
+
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app needs your location even in the background to notify you of nearby emergencies.</string>
 </dict>
 </plist>
