@@ -1,0 +1,235 @@
+{
+  "@@locale": "ar",
+  "attendanceReport": "تقرير الحضور",
+  "@attendanceReport": {
+    "description": "From: all_employes_page_view.dart:28"
+  },
+  "departmentEmployeesList": "قائمة موظفي القسم:",
+  "@departmentEmployeesList": {
+    "description": "From: all_employes_page_view.dart:59"
+  },
+  "noTeamsFound": "لم يتم العثور على فرق",
+  "@noTeamsFound": {
+    "description": "From: all_employes_page_view.dart:72"
+  },
+  "teamName": "اسم الفريق",
+  "@teamName": {
+    "description": "From: all_employes_page_view.dart:97"
+  },
+  "fullName": "الاسم الكامل",
+  "@fullName": {
+    "description": "From: all_employes_page_view.dart:128"
+  },
+  "email": "بريد إلكتروني",
+  "@email": {
+    "description": "From: all_employes_page_view.dart:133"
+  },
+  "applyLeave": "تطبيق الإجازة",
+  "@applyLeave": {
+    "description": "From: apply_leave_page_view.dart:24"
+  },
+  "selectLeaveType": "حدد نوع الإجازة",
+  "@selectLeaveType": {
+    "description": "From: apply_leave_page_view.dart:31"
+  },
+  "selectApprovalPerson": "حدد الشخص المعتمد",
+  "@selectApprovalPerson": {
+    "description": "From: apply_leave_page_view.dart:80"
+  },
+  "noAdminMembersFound": "لم يتم العثور على أعضاء الإدارة",
+  "@noAdminMembersFound": {
+    "description": "From: apply_leave_page_view.dart:86"
+  },
+  "reasonForLeave": "سبب الإجازة",
+  "@reasonForLeave": {
+    "description": "From: apply_leave_page_view.dart:76"
+  },
+  "userActivity": "نشاط المستخدم",
+  "@userActivity": {
+    "description": "From: attend_report_view.dart:77"
+  },
+  "authview": "AuthView",
+  "@authview": {
+    "description": "From: auth_view.dart:13"
+  },
+  "authviewIsWorking": "AuthView يعمل",
+  "@authviewIsWorking": {
+    "description": "From: auth_view.dart:17"
+  },
+  "areYouSureYouWantToDeleteThis": "هل أنت متأكد أنك تريد حذف هذا؟",
+  "@areYouSureYouWantToDeleteThis": {
+    "description": "From: holiday_page_controller.dart:90"
+  },
+  "holidays": "العطل",
+  "@holidays": {
+    "description": "From: holiday_page_view.dart:23"
+  },
+  "noHollidayFound": "لم يتم العثور على هوليداي.",
+  "@noHollidayFound": {
+    "description": "From: holiday_page_view.dart:33"
+  },
+  "label": "ملصق",
+  "@label": {
+    "description": "From: holiday_page_view.dart:65"
+  },
+  "todayAttendence": "الحضور اليوم",
+  "@todayAttendence": {
+    "description": "From: home_page_view.dart:74"
+  },
+  "yourActivity": "نشاطك",
+  "@yourActivity": {
+    "description": "From: home_page_view.dart:223"
+  },
+  "enterRejectReason": "أدخل سبب الرفض",
+  "@enterRejectReason": {
+    "description": "From: leave_page_controller.dart:148"
+  },
+  "allLeaves": "جميع الأوراق",
+  "@allLeaves": {
+    "description": "From: leave_page_view.dart:20"
+  },
+  "noDataFound": "لم يتم العثور على بيانات.",
+  "@noDataFound": {
+    "description": "From: leave_page_view.dart:151"
+  },
+  "enterNewPassword": "أدخل كلمة المرور الجديدة",
+  "@enterNewPassword": {
+    "description": "From: login_page_controller.dart:106"
+  },
+  "reenterNewPassword": "أعد إدخال كلمة المرور الجديدة",
+  "@reenterNewPassword": {
+    "description": "From: login_page_controller.dart:111"
+  },
+  "helloThereLoginToContinue": "مرحبًا بك، قم بتسجيل الدخول للمتابعة",
+  "@helloThereLoginToContinue": {
+    "description": "From: login_page_view.dart:34"
+  },
+  "orLoginWithFingerprint": "أو تسجيل الدخول ببصمة الإصبع",
+  "@orLoginWithFingerprint": {
+    "description": "From: login_page_view.dart:72"
+  },
+  "username": "اسم المستخدم",
+  "@username": {
+    "description": "From: login_page_view.dart:42"
+  },
+  "password": "كلمة المرور",
+  "@password": {
+    "description": "From: login_page_view.dart:47"
+  },
+  "loginWithFingerprint": "تسجيل الدخول ببصمة الإصبع",
+  "@loginWithFingerprint": {
+    "description": "From: login_page_view.dart:82"
+  },
+  "updateOrganization": "تحديث المنظمة",
+  "@updateOrganization": {
+    "description": "From: profile_page_view.dart:289"
+  },
+  "userName": "اسم المستخدم",
+  "@userName": {
+    "description": "From: profile_page_view.dart:39"
+  },
+  "branchName": "اسم الفرع",
+  "@branchName": {
+    "description": "From: profile_page_view.dart:47"
+  },
+  "departmentName": "اسم القسم",
+  "@departmentName": {
+    "description": "From: profile_page_view.dart:55"
+  },
+  "enterOldPassword": "أدخل كلمة المرور القديمة",
+  "@enterOldPassword": {
+    "description": "From: profile_page_view.dart:136"
+  },
+  "enterNewPassword_1": "أدخل كلمة المرور الجديدة",
+  "@enterNewPassword_1": {
+    "description": "From: profile_page_view.dart:141"
+  },
+  "organizationName": "اسم المنظمة",
+  "@organizationName": {
+    "description": "From: profile_page_view.dart:218"
+  },
+  "allSchedules": "جميع الجداول الزمنية",
+  "@allSchedules": {
+    "description": "From: schedule_report_view.dart:24"
+  },
+  "noSchedulesFound": "لم يتم العثور على جداول زمنية",
+  "@noSchedulesFound": {
+    "description": "From: schedule_report_view.dart:69"
+  },
+  "mySchedule": "الجدول الزمني الخاص بي",
+  "@mySchedule": {
+    "description": "From: schedule_report_view.dart:77"
+  },
+  "otherSchedules": "جداول أخرى",
+  "@otherSchedules": {
+    "description": "From: schedule_report_view.dart:79"
+  },
+  "assignedUsers": "المستخدمون المعينون:",
+  "@assignedUsers": {
+    "description": "From: schedule_report_view.dart:139"
+  },
+  "u": "- $ش",
+  "@u": {
+    "description": "From: schedule_report_view.dart:141"
+  },
+  "workingDays": "أيام العمل:",
+  "@workingDays": {
+    "description": "From: schedule_report_view.dart:173"
+  },
+  "addSchedule": "إضافة الجدول الزمني",
+  "@addSchedule": {
+    "description": "From: schedules_page_view.dart:30"
+  },
+  "scheduleName": "اسم الجدول الزمني",
+  "@scheduleName": {
+    "description": "From: schedules_page_view.dart:49"
+  },
+  "registerAccount": "تسجيل الحساب",
+  "@registerAccount": {
+    "description": "From: sign_up_page_view.dart:34"
+  },
+  "helloThereSignUpToContinue": "مرحبًا بك، قم بالتسجيل للمتابعة",
+  "@helloThereSignUpToContinue": {
+    "description": "From: sign_up_page_view.dart:55"
+  },
+  "noBranchFound": "لم يتم العثور على فرع",
+  "@noBranchFound": {
+    "description": "From: sign_up_page_view.dart:101"
+  },
+  "selectBranch": "حدد الفرع",
+  "@selectBranch": {
+    "description": "From: sign_up_page_view.dart:105"
+  },
+  "noDepartmentFound": "لم يتم العثور على قسم",
+  "@noDepartmentFound": {
+    "description": "From: sign_up_page_view.dart:126"
+  },
+  "selectDepartment": "اختر القسم",
+  "@selectDepartment": {
+    "description": "From: sign_up_page_view.dart:130"
+  },
+  "youCanLoginLaterWithFingerprint": "يمكنك تسجيل الدخول لاحقا باستخدام بصمة الإصبع",
+  "@youCanLoginLaterWithFingerprint": {
+    "description": "From: sign_up_page_view.dart:285"
+  },
+  "emailAddress": "عنوان البريد الإلكتروني",
+  "@emailAddress": {
+    "description": "From: sign_up_page_view.dart:75"
+  },
+  "perMonthPaidLeave": "إجازة شهرية مدفوعة الأجر",
+  "@perMonthPaidLeave": {
+    "description": "From: sign_up_page_view.dart:240"
+  },
+  "perMonthSickcasualLeave": "إجازة مرضية/عارضة شهريًا",
+  "@perMonthSickcasualLeave": {
+    "description": "From: sign_up_page_view.dart:248"
+  },
+  "perMonthWorkFromHome": "العمل شهريًا من المنزل",
+  "@perMonthWorkFromHome": {
+    "description": "From: sign_up_page_view.dart:256"
+  },
+  "date": "تاريخ",
+  "@date": {
+    "description": "From: leave_activity_card.dart:39"
+  }
+}
