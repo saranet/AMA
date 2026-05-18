@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:ama/app/modules/LoginPage/bindings/login_page_binding.dart';
 import 'package:ama/app/modules/LoginPage/views/login_page_view.dart';
 import 'package:ama/app/routes/app_pages.dart';
+import 'package:ama/data/controllers/app_storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -38,7 +39,7 @@ class _SessionManagerState extends State<SessionManager> {
 
   void _logoutUser() {
     _inactivityTimer?.cancel();
-    Get.offAllNamed(Routes.LOGIN_PAGE); // Navigate to login page
+    AppStorageController.to.logout(); // clears storage + navigates to login
   }
 
   @override

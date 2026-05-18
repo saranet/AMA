@@ -20,17 +20,8 @@ class SplashScreenPageController extends GetxController {
   String get appImageLogo => AppImages.appLogo;
 
   checkUserIsLoggedIn() async {
-    // Run auth check and minimum animation time in parallel
-    final results = await Future.wait([
-      AppStorageController.to.isUserLoggedIn(),
-      Future.delayed(const Duration(milliseconds: 1500)),
-    ]);
-    final isLoggedIn = results[0] as bool;
-    if (isLoggedIn) {
-      Get.offAllNamed(Routes.DASH_BOARD_PAGE);
-    } else {
-      Get.offAllNamed(Routes.LOGIN_PAGE);
-    }
+    await Future.delayed(const Duration(milliseconds: 1500));
+    Get.offAllNamed(Routes.LOGIN_PAGE);
   }
 
   @override

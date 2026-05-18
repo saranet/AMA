@@ -20,7 +20,7 @@ class HomePageController extends GetxController {
   static final _timeFormat = DateFormat("HH:mm:ss");
   final authController = Get.find<AuthController>();
   bool available = false;
-  var selectedDate = DateTime.now().obs;
+  var selectedDate = DateTime.now().toUtc().add(const Duration(hours: 3)).obs;
   var attendenceLoading = true.obs, activityLoading = true.obs;
   var attendenceModel = Rxn<AttendenceModel?>(null);
   var userActivityModel = Rxn<UserActivityModel?>(null);
