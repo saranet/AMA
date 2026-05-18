@@ -1,4 +1,3 @@
-import 'package:ama/app/modules/Auth/controllers/auth_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ama/app/modules/HomePage/model/user_activity_model.dart';
@@ -13,12 +12,16 @@ import 'package:ama/widgets/horizontal_date.dart';
 import 'package:ama/widgets/swipebutton/swipe_button.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../controllers/home_page_controller.dart';
 
 class HomePageView extends GetView<HomePageController> {
   const HomePageView({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: ListView(
         children: [
@@ -66,12 +69,12 @@ class HomePageView extends GetView<HomePageController> {
             }),
           ),
           28.height,
-          //? Today Attendence Text
+          //? Today Attendance Text
           Padding(
             padding: const EdgeInsets.only(left: 16),
             child: Row(
               children: [
-                Text("Today Attendence", style: Get.textTheme.headlineSmall),
+                Text(l10n.todayAttendence, style: Get.textTheme.headlineSmall),
                 16.width,
                 if (AppStorageController.to.currentUser?.roleType ==
                         UserRoleType.admin ||
@@ -79,12 +82,12 @@ class HomePageView extends GetView<HomePageController> {
                         UserRoleType.manager ||
                     AppStorageController.to.currentUser?.roleType ==
                         UserRoleType.superAdmin) ...[
-                  Spacer(),
+                  const Spacer(),
                   IconButton(
                     onPressed: () {
                       Get.toNamed(Routes.HOME_ANALYTICS);
                     },
-                    icon: Icon(Icons.analytics_outlined),
+                    icon: const Icon(Icons.analytics_outlined),
                   ),
                   20.width,
                 ],
@@ -120,16 +123,15 @@ class HomePageView extends GetView<HomePageController> {
                     String msg = "";
 
                     if (checkIns != null && checkIns.isNotEmpty) {
-                      // show first check-in time
                       time = DateFormat("HH:mm:ss")
                           .parse(checkIns.first.inTime!)
                           .tohhMMh;
-                      msg = checkIns.first.msg ?? '';
+                      msg = _translateMsg(checkIns.first.msg, l10n);
                     }
 
                     return _buildCheckInOutCard(
                       Icons.input_rounded,
-                      "Check In",
+                      l10n.checkIn,
                       time,
                       msg,
                     );
@@ -144,16 +146,15 @@ class HomePageView extends GetView<HomePageController> {
                     String msg = "";
 
                     if (outTimes != null && outTimes.isNotEmpty) {
-                      // show last checkout time
                       time = DateFormat("HH:mm:ss")
                           .parse(outTimes.last.outTime!)
                           .tohhMMh;
-                      msg = outTimes.last.msg ?? '';
+                      msg = _translateMsg(outTimes.last.msg, l10n);
                     }
 
                     return _buildCheckInOutCard(
                       Icons.logout_rounded,
-                      "Check Out",
+                      l10n.checkOut,
                       time,
                       msg,
                     );
@@ -170,13 +171,12 @@ class HomePageView extends GetView<HomePageController> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Expanded(child: _buildCheckInOutCard(Icons.free_breakfast_outlined, "Break Time", "00:20 min", "Avg Time 30min")),
                 Expanded(
                   child: Obx(
                     () {
                       return _buildCheckInOutCard(
                         Icons.free_breakfast_outlined,
-                        "Break Time",
+                        l10n.breakTime,
                         controller.calculateTimeDifference(
                                 controller.attendenceModel.value?.breakInTime,
                                 controller
@@ -191,9 +191,9 @@ class HomePageView extends GetView<HomePageController> {
                 Expanded(
                   child: _buildCheckInOutCard(
                     Icons.calendar_today_outlined,
-                    "Total Days", '0',
-                    //controller.countWorkingDays.toString(),
-                    "Working Days/M",
+                    l10n.totalDays,
+                    '0',
+                    l10n.workingDays,
                   ),
                 ),
               ],
@@ -203,13 +203,13 @@ class HomePageView extends GetView<HomePageController> {
           Obx(
             () {
               if (controller.workingTime.isEmpty) {
-                return SizedBox();
+                return const SizedBox();
               }
               return Padding(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 child: _buildCheckInOutCard(
                   Icons.work_history_outlined,
-                  "Total Working Hours",
+                  l10n.totalWorkingHours,
                   controller.workingTime.value,
                   '-',
                 ),
@@ -220,10 +220,10 @@ class HomePageView extends GetView<HomePageController> {
           //? Your Activity View All
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Text("Your Activity", style: Get.textTheme.headlineSmall),
+            child: Text(l10n.yourActivity, style: Get.textTheme.headlineSmall),
           ),
           20.height,
-          //? Swipe Button
+          //? Swipe Button (with duplicate-prevention)
           Obx(() {
             final actions = controller.userPerformActivties;
             final isToday = controller.selectedDate.value.year ==
@@ -231,10 +231,12 @@ class HomePageView extends GetView<HomePageController> {
                 controller.selectedDate.value.month == controller.now.month &&
                 controller.selectedDate.value.day == controller.now.day;
 
-            // Only show buttons if on today and actions are available
             if (!isToday || actions.isEmpty) {
               return const SizedBox();
             }
+
+            // ✅ Watch processing state
+            final isProcessing = controller.isPerformingAction.value;
 
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -243,25 +245,40 @@ class HomePageView extends GetView<HomePageController> {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 12),
                     child: SwipeButton.expand(
-                      thumb: const Icon(
-                        Icons.double_arrow_rounded,
-                        color: Colors.white,
-                      ),
+                      // ✅ Disable during processing
+                      enabled: !isProcessing,
+                      // ✅ Show spinner while processing
+                      thumb: isProcessing
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Icon(
+                              Icons.double_arrow_rounded,
+                              color: Colors.white,
+                            ),
                       thumbPadding: const EdgeInsets.all(6),
                       height: 58,
                       borderRadius: borderRadius,
                       activeThumbColor: AppColors.kBlue900,
                       activeTrackColor: AppColors.kBlue600,
-                      onSwipe: controller.available
-                          ? () =>
-                              controller.authController.authenticateAndRun(() {
-                                controller
-                                    .performInOut(action); // ✅ Pass action
-                              })
-                          : () =>
-                              controller.performInOut(action), // ✅ Pass action
+                      inactiveThumbColor: AppColors.kGrey300,
+                      inactiveTrackColor: AppColors.kGrey100,
+                      // ✅ onSwipe is null when processing
+                      onSwipe: isProcessing
+                          ? null
+                          : controller.available
+                              ? () => controller.authController
+                                      .authenticateAndRun(() {
+                                    controller.performInOut(action);
+                                  })
+                              : () => controller.performInOut(action),
                       child: Text(
-                        action.label, // ✅ Each button shows its own label
+                        isProcessing ? l10n.processing : action.label,
                         style: Get.textTheme.titleSmall,
                       ),
                     ),
@@ -274,12 +291,13 @@ class HomePageView extends GetView<HomePageController> {
           20.height,
 
           Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Obx(() {
-                return UserActivityView(
-                  userActivityModel: controller.userActivityModel.value,
-                );
-              })),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Obx(() {
+              return UserActivityView(
+                userActivityModel: controller.userActivityModel.value,
+              );
+            }),
+          ),
           28.height,
           60.height,
         ],
@@ -287,7 +305,7 @@ class HomePageView extends GetView<HomePageController> {
     );
   }
 
-  _buildCheckInOutCard(
+  Widget _buildCheckInOutCard(
     IconData iconData,
     String title,
     String time,
@@ -299,7 +317,6 @@ class HomePageView extends GetView<HomePageController> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          // mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
@@ -339,5 +356,29 @@ class HomePageView extends GetView<HomePageController> {
         ),
       ),
     );
+  }
+
+  String _translateMsg(String? msg, AppLocalizations l10n) {
+    if (msg == null || msg.trim().isEmpty) return '';
+
+    final normalized = msg.toLowerCase().trim().replaceAll(RegExp(r'\s+'), ' ');
+
+    switch (normalized) {
+      case 'late':
+        return l10n.msgLate;
+      case 'on time':
+      case 'ontime':
+        return l10n.msgOnTime;
+      case 'over time':
+      case 'overtime':
+        return l10n.msgOverTime;
+      case 'early':
+        return l10n.msgEarly;
+      case 'early checkout':
+      case 'earlycheckout':
+        return l10n.msgEarlyCheckout;
+      default:
+        return msg;
+    }
   }
 }

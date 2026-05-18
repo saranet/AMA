@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:ama/app/modules/Auth/model/AllowedZone.dart';
 import 'package:ama/app/modules/Auth/services/AllowedZoneService.dart';
-import 'package:ama/app/modules/Auth/services/ZoneStorageService.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
 
@@ -15,17 +13,21 @@ import 'package:ama/data/controllers/api_url_service.dart';
 import 'package:ama/data/controllers/app_storage_service.dart';
 import 'package:ama/utils/app_extensions.dart';
 import 'package:ama/utils/helper_function.dart';
+import 'package:ama/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 class HomePageController extends GetxController {
+  static final _timeFormat = DateFormat("HH:mm:ss");
   final authController = Get.find<AuthController>();
   bool available = false;
   var selectedDate = DateTime.now().obs;
   var attendenceLoading = true.obs, activityLoading = true.obs;
   var attendenceModel = Rxn<AttendenceModel?>(null);
   var userActivityModel = Rxn<UserActivityModel?>(null);
-  var userPerformActivties =
-      <UserPerformActivty>[].obs; // Was: userPerformActivty
+  var userPerformActivties = <UserPerformActivty>[].obs;
+
+  // ✅ Tracks if a swipe action is being processed (blocks duplicates)
+  var isPerformingAction = false.obs;
 
   var now = DateTime.now();
   final RxList<AllowedZone> allowedZones = <AllowedZone>[].obs;
@@ -35,20 +37,26 @@ class HomePageController extends GetxController {
   var workingTime = "".obs;
   Timer? _timer;
 
+  // ✅ GPS cache to speed up swipes
+  Position? _lastKnownPosition;
+  DateTime? _lastPositionTime;
+  static const _positionCacheDuration = Duration(seconds: 30);
+
+  AppLocalizations get l10n => AppLocalizations.of(Get.context!)!;
+
   @override
   void onInit() {
     available = authController.isBiometricAvailable.value;
     super.onInit();
-
-    //checkUserLocation();
   }
 
   @override
   void onReady() {
     super.onReady();
     getAllData();
-    // getActivityData();
   }
+
+  // ── TIMER (FIXED — no more 1-hour offset) ──────────────────────────────────
 
   void startTimer() {
     _timer?.cancel();
@@ -59,26 +67,33 @@ class HomePageController extends GetxController {
       return;
     }
 
-    DateFormat format = DateFormat("HH:mm:ss");
-    final now = DateTime.now();
+    final today = DateTime.now();
 
-    // ✅ Calculate ALL working hours from all sessions
+    // Parse times relative to TODAY's date (not 1970-01-01)
+    DateTime parseTime(String timeStr) {
+      final parsed = _timeFormat.parse(timeStr);
+      return DateTime(
+        today.year,
+        today.month,
+        today.day,
+        parsed.hour,
+        parsed.minute,
+        parsed.second,
+      );
+    }
+
     Duration totalWorking = Duration.zero;
-
-    // Loop through all check-ins and check-outs
     for (int i = 0; i < model.inTimes!.length; i++) {
       if (i < (model.outTimes?.length ?? 0)) {
         try {
-          var inTime = format.parse(model.inTimes![i]);
-          var outTime = format.parse(model.outTimes![i]);
+          final inTime = parseTime(model.inTimes![i]);
+          final outTime = parseTime(model.outTimes![i]);
           totalWorking += outTime.difference(inTime);
         } catch (e) {
-          print("Error parsing session $i: $e");
-        }
+            }
       }
     }
 
-    // ✅ Subtract all break times
     Duration totalBreak = Duration.zero;
     if (model.breakInTime != null &&
         model.breakOutTime != null &&
@@ -87,63 +102,49 @@ class HomePageController extends GetxController {
       for (int i = 0; i < model.breakInTime!.length; i++) {
         if (i < model.breakOutTime!.length) {
           try {
-            var breakIn = format.parse(model.breakInTime![i]);
-            var breakOut = format.parse(model.breakOutTime![i]);
+            final breakIn = parseTime(model.breakInTime![i]);
+            final breakOut = parseTime(model.breakOutTime![i]);
             totalBreak += breakOut.difference(breakIn);
           } catch (e) {
-            print("Error parsing break $i: $e");
-          }
+            }
         }
       }
     }
 
-    // Check if user is still working (more check-ins than check-outs)
     final isStillWorking =
         (model.outTimes?.length ?? 0) < model.inTimes!.length;
 
     if (isStillWorking) {
-      // User is still working - run timer
       final lastCheckInStr = model.inTimes!.last;
-      final lastCheckInTime = _parseTimeString(lastCheckInStr, now);
+      final lastCheckInTime = parseTime(lastCheckInStr);
 
+      // ✅ Get fresh DateTime.now() inside timer callback
       _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-        // Add current session duration
+        final now = DateTime.now();
         final currentSessionDuration = now.difference(lastCheckInTime);
         final netWorking = totalWorking + currentSessionDuration - totalBreak;
 
         if (netWorking.isNegative) {
           workingTime.value = "00:00:00";
         } else {
-          workingTime.value = netWorking.toString().split(".")[0];
+          workingTime.value = _formatDuration(netWorking);
         }
       });
     } else {
-      // User checked out - just show total
       final netWorking = totalWorking - totalBreak;
       if (netWorking.isNegative) {
         workingTime.value = "00:00:00";
       } else {
-        workingTime.value = netWorking.toString().split(".")[0];
+        workingTime.value = _formatDuration(netWorking);
       }
     }
   }
 
-// ✅ Helper to parse time string into DateTime with today's date
-  DateTime _parseTimeString(String timeStr, DateTime referenceDate) {
-    try {
-      final parsed = DateFormat("HH:mm:ss").parse(timeStr);
-      return DateTime(
-        referenceDate.year,
-        referenceDate.month,
-        referenceDate.day,
-        parsed.hour,
-        parsed.minute,
-        parsed.second,
-      );
-    } catch (e) {
-      print("Error parsing time: $e");
-      return DateTime.now();
-    }
+  String _formatDuration(Duration duration) {
+    final hours = duration.inHours.toString().padLeft(2, '0');
+    final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return "$hours:$minutes:$seconds";
   }
 
   void stopTimer() {
@@ -151,19 +152,18 @@ class HomePageController extends GetxController {
     _timer = null;
   }
 
+  // ── DATA LOADING ───────────────────────────────────────────────────────────
+
   void onDateChnged(DateTime newDate) {
     selectedDate.value = newDate;
-
     getAllData();
-    // getTodatyAttendenceData();
-    //getActivityData();
   }
 
   void getAllData({
     Map<String, dynamic>? attendanceData,
     Map<String, dynamic>? activityData,
   }) {
-    // If data is provided (from performInOut success), process it directly
+    // ✅ Use response data directly if provided (no extra API call)
     if (attendanceData != null && activityData != null) {
       attendenceLoading.value = false;
       activityLoading.value = false;
@@ -174,21 +174,13 @@ class HomePageController extends GetxController {
       return;
     }
 
-    // Original logic: Perform network call for initial load or date change
     var url = APIUrlsService.to.getDataByIDAndCompanyIdAndDate(
       AppStorageController.to.currentUser!.userID!,
       AppStorageController.to.currentUser!.companyID!,
       selectedDate.value.toYYYMMDD,
     );
 
-    ApiController.to.callGETAPI(url: url).catchError((e) {
-      showErrorSnack(e.toString());
-      activityLoading.value = false;
-      attendenceLoading.value = false;
-      userPerformActivties.value = [
-        UserPerformActivty.IN
-      ]; // Default to IN on error
-    }).then((resp) {
+    ApiController.to.callGETAPI(url: url).then((resp) {
       attendenceLoading.value = false;
       activityLoading.value = false;
       if (resp is Map<String, dynamic> && resp['status'] == true) {
@@ -198,15 +190,15 @@ class HomePageController extends GetxController {
           getActivityData(resp['activity']);
         }
       } else {
-        // No Data or API error
         attendenceModel.value = null;
         userActivityModel.value = null;
         userPerformActivties.value = [UserPerformActivty.IN];
         stopTimer();
-        if (resp is Map<String, dynamic>) {
-          showErrorSnack(resp['errorMsg']?.toString() ?? "Unknown error.");
-        }
       }
+    }).catchError((e) {
+      activityLoading.value = false;
+      attendenceLoading.value = false;
+      userPerformActivties.value = [UserPerformActivty.IN];
     });
   }
 
@@ -217,25 +209,22 @@ class HomePageController extends GetxController {
     }
 
     Duration total = Duration.zero;
-    DateFormat format = DateFormat("HH:mm:ss");
-
     for (int i = 0;
         i < attendenceModel.value!.inTimes!.length &&
             i < attendenceModel.value!.outTimes!.length;
         i++) {
-      var inTime = format.parse(attendenceModel.value!.inTimes![i]);
-      var outTime = format.parse(attendenceModel.value!.outTimes![i]);
+      final inTime = _timeFormat.parse(attendenceModel.value!.inTimes![i]);
+      final outTime = _timeFormat.parse(attendenceModel.value!.outTimes![i]);
       total += outTime.difference(inTime);
     }
 
-    return total.toString().split(".")[0];
+    return _formatDuration(total);
   }
 
   void getActivityData(Map<String, dynamic> data) {
     try {
       if (data.isEmpty) {
         userActivityModel.value = null;
-        // FIX: If data is empty, the only available action is IN
         userPerformActivties.value = [UserPerformActivty.IN];
         return;
       }
@@ -250,13 +239,11 @@ class HomePageController extends GetxController {
       }
       userPerformActivties.clear();
 
-      // Multi check-in/out logic (rest of the logic remains the same)
       final checkInCount = model.checkIn?.length ?? 0;
       final checkOutCount = model.outTime?.length ?? 0;
       final breakInCount = model.breakInTime?.length ?? 0;
       final breakOutCount = model.breakOutTime?.length ?? 0;
 
-      // Simple flow: Check In → Break In → Break Out → Check Out
       if (checkInCount == 0) {
         userPerformActivties.add(UserPerformActivty.IN);
       } else if (checkInCount > checkOutCount) {
@@ -271,111 +258,118 @@ class HomePageController extends GetxController {
       } else {
         userPerformActivties.add(UserPerformActivty.IN);
       }
-    } catch (e, st) {
-      print("Error parsing activity data: $e\n$st");
+    } catch (_) {
       userActivityModel.value = null;
       activityLoading.value = false;
-      // FIX: If parsing fails, allow the user to check in
       userPerformActivties.value = [UserPerformActivty.IN];
     }
   }
 
-  void performInOut(UserPerformActivty activity) async {
-    if (activityLoading.value) return;
-    activityLoading.value = true;
+  // ── PERFORM IN/OUT (FAST + DUPLICATE-PROOF) ───────────────────────────────
 
-    final position = await getCurrentPosition();
-    if (position == null) {
-      activityLoading.value = false;
-      return;
-    }
-
-    final canCheckIn = zoneService.isWithinAllowedZone(position);
-
-    if (!canCheckIn) {
-      Get.snackbar(
-          "Attendance Blocked", "You are outside allowed attendance zone ❌",
-          backgroundColor: Colors.red.shade400, colorText: Colors.white);
-      activityLoading.value = false;
-      return;
-    }
-
-    // Build payload body
-    final nowStr = DateTime.now().toHOUR24MINUTESECOND;
-    var payload = {
-      "activityID": userActivityModel.value?.activityID,
-      "userID": AppStorageController.to.currentUser?.userID,
-      "companyID": AppStorageController.to.currentUser?.companyID,
-      "activityType": activity.name,
-    };
-    if (activity == UserPerformActivty.IN) {
-      payload.putIfAbsent("inTime", () => nowStr);
-    } else if (activity == UserPerformActivty.BREAKIN) {
-      payload.putIfAbsent("breakInTime", () => nowStr);
-    } else if (activity == UserPerformActivty.BREAKOUT) {
-      payload.putIfAbsent("breakOutTime", () => nowStr);
-    } else if (activity == UserPerformActivty.OUT) {
-      payload.putIfAbsent("outTime", () => nowStr);
-    }
-
-    bool sentOnline = false;
-    Map<String, dynamic>? resp;
-    // print("payload: $payload");
-    try {
-      resp = await ApiController.to
-          .callPOSTAPI(url: APIUrlsService.to.dailyInOut, body: payload);
-      if (resp != null &&
-          resp is Map<String, dynamic> &&
-          resp['status'] == true) {
-        sentOnline = true;
-      } else {
-        showErrorSnack("Server response error: $resp");
+  /// Get GPS position fast — uses 30-second cache
+  Future<Position?> _getCachedPosition() async {
+    if (_lastKnownPosition != null && _lastPositionTime != null) {
+      final age = DateTime.now().difference(_lastPositionTime!);
+      if (age < _positionCacheDuration) {
+          return _lastKnownPosition;
       }
-    } catch (e) {
-      showErrorSnack("Network/API error when sending attendance: $e");
     }
 
-    if (sentOnline) {
-      showSuccessSnack("Attendance recorded.");
-
-      if (resp!['data'] != null && resp['activity'] != null) {
-        getAllData(
-          attendanceData: resp['data'] as Map<String, dynamic>,
-          activityData: resp['activity'] as Map<String, dynamic>,
-        );
-      } else {
-        getAllData();
-      }
-    } /*else {
-      // Save to offline queue
-      await offlineService.queueAttendance(
-        activityType: activity.name,
-        time: nowStr,
-        lat: position.latitude,
-        lng: position.longitude,
-        extra: {
-          "activityID": userActivityModel.value?.activityID,
-        },
-      );
-      showSuccessSnack("Attendance saved locally. It will sync when online.");
-      // Full refresh is needed here since we didn't get the updated state from the server
-      getAllData();
-    }*/
-
-    activityLoading.value = false;
+    final pos = await getCurrentPosition();
+    if (pos != null) {
+      _lastKnownPosition = pos;
+      _lastPositionTime = DateTime.now();
+    }
+    return pos;
   }
+
+  void performInOut(UserPerformActivty activity) async {
+    // ✅ Block duplicate calls
+    if (isPerformingAction.value) {
+      //print('⚠️ Action already in progress — ignoring duplicate swipe');
+      return;
+    }
+
+    isPerformingAction.value = true;
+
+    try {
+      // ✅ Use cached GPS to skip 1-2 second wait
+      final position = await _getCachedPosition();
+      if (position == null) {
+        return;
+      }
+
+      if (!zoneService.isWithinAllowedZone(position)) {
+        Get.snackbar(
+          l10n.attendanceBlocked,
+          l10n.youAreOutsideAllowedAttendanceZone,
+          backgroundColor: Colors.red.shade400,
+          colorText: Colors.white,
+        );
+        return;
+      }
+
+      final nowStr = DateTime.now().toHOUR24MINUTESECOND;
+      var payload = {
+        "activityID": userActivityModel.value?.activityID,
+        "userID": AppStorageController.to.currentUser?.userID,
+        "companyID": AppStorageController.to.currentUser?.companyID,
+        "activityType": activity.name,
+      };
+      if (activity == UserPerformActivty.IN) {
+        payload.putIfAbsent("inTime", () => nowStr);
+      } else if (activity == UserPerformActivty.BREAKIN) {
+        payload.putIfAbsent("breakInTime", () => nowStr);
+      } else if (activity == UserPerformActivty.BREAKOUT) {
+        payload.putIfAbsent("breakOutTime", () => nowStr);
+      } else if (activity == UserPerformActivty.OUT) {
+        payload.putIfAbsent("outTime", () => nowStr);
+      }
+
+      try {
+        final resp = await ApiController.to
+            .callPOSTAPI(url: APIUrlsService.to.dailyInOut, body: payload);
+
+        if (resp != null &&
+            resp is Map<String, dynamic> &&
+            resp['status'] == true) {
+          showSuccessSnack(l10n.attendanceRecorded);
+
+          // ✅ Use response data directly — no second API call!
+          if (resp['data'] != null && resp['activity'] != null) {
+            getAllData(
+              attendanceData: resp['data'] as Map<String, dynamic>,
+              activityData: resp['activity'] as Map<String, dynamic>,
+            );
+          } else {
+            getAllData();
+          }
+        } else {
+          final errMsg = resp is Map
+              ? (resp['errorMsg']?.toString() ?? l10n.unknownError)
+              : l10n.unknownError;
+          showErrorSnack(errMsg);
+        }
+      } catch (e) {
+        showErrorSnack(e.toString());
+      }
+    } finally {
+      // ✅ ALWAYS reset — even on errors
+      isPerformingAction.value = false;
+    }
+  }
+
+  // ── HELPERS ────────────────────────────────────────────────────────────────
 
   Duration calculateTotalBreakTime(
       List<String> inTimes, List<String> outTimes) {
     Duration totalBreakTime = Duration.zero;
-    DateFormat format = DateFormat("HH:mm:ss");
-
     for (int i = 0; i < inTimes.length && i < outTimes.length; i++) {
-      DateTime inTime = format.parse(inTimes[i]);
-      DateTime outTime = format.parse(outTimes[i]);
+      final inTime = _timeFormat.parse(inTimes[i]);
+      final outTime = _timeFormat.parse(outTimes[i]);
       totalBreakTime += outTime.difference(inTime);
     }
-
     return totalBreakTime;
   }
 
@@ -385,23 +379,15 @@ class HomePageController extends GetxController {
       return null;
     }
 
-    var times = mergeBreakInBreakOutTimes(inTimes!, outTimes!);
-    print(times);
-
+    final times = mergeBreakInBreakOutTimes(inTimes!, outTimes!);
     Duration totalDuration = Duration.zero;
     if (times.length < 2) {
-      // If there are less than two elements, return zero duration
       return secondsToTime(totalDuration.inSeconds);
     }
-    DateFormat format = DateFormat("HH:mm:ss");
-    //i=2
     for (int i = 0; i < times.length - 1; i = i + 2) {
-      print("$i ${times.length}");
-      if (i > times.length) {
-        break;
-      }
-      DateTime currentTime = format.parse(times[i]);
-      DateTime nextTime = format.parse(times[i + 1]);
+      if (i > times.length) break;
+      final currentTime = _timeFormat.parse(times[i]);
+      final nextTime = _timeFormat.parse(times[i + 1]);
       totalDuration += nextTime.difference(currentTime);
     }
     return secondsToTime(totalDuration.inSeconds);
@@ -431,10 +417,12 @@ class HomePageController extends GetxController {
     return count;
   }
 
+  // ── LOCATION ───────────────────────────────────────────────────────────────
+
   Future<Position?> getCurrentPosition() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      showErrorSnack("Location services are disabled.");
+      showErrorSnack(l10n.locationServicesAreDisabled);
       return null;
     }
 
@@ -442,18 +430,19 @@ class HomePageController extends GetxController {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        showErrorSnack("Location permission denied.");
+        showErrorSnack(l10n.locationPermissionDenied);
         return null;
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      showErrorSnack("Location permission permanently denied.");
+      showErrorSnack(l10n.locationPermissionPermanentlyDenied);
       return null;
     }
 
     return await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+        desiredAccuracy: LocationAccuracy.medium,
+        timeLimit: const Duration(seconds: 10));
   }
 
   Future<void> checkUserLocation() async {

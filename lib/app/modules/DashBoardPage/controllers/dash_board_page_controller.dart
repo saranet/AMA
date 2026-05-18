@@ -49,7 +49,6 @@ class DashboardPageController extends GetxController {
   }
 
   onBottomNavTap(int newIndex) {
-    print(newIndex);
     if (newIndex == currentIndex.value) return;
     if (!(canPageLoad[newIndex]!)) {
       canPageLoad[newIndex] = true;
@@ -78,6 +77,7 @@ class DashboardPageController extends GetxController {
 
   void onFloatTap() {
     if (!(canPageLoad[4]!)) {
+      canPageLoad[4] = true;
       pages.removeAt(4);
       AllEmployesPageBinding().dependencies();
       pages.insert(4, const AllEmployesPageView());

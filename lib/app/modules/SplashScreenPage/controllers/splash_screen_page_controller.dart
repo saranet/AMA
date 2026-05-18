@@ -4,9 +4,8 @@ import 'package:get/get.dart';
 import '../../../../data/controllers/app_storage_service.dart';
 
 class SplashScreenPageController extends GetxController {
-  //TODO: Implement SplashScreenPageController
-
   final count = 0.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -19,11 +18,18 @@ class SplashScreenPageController extends GetxController {
   }
 
   String get appImageLogo => AppImages.appLogo;
+
   checkUserIsLoggedIn() async {
-    if (await AppStorageController.to.isUserLoggedIn()) {
+    // Run auth check and minimum animation time in parallel
+    final results = await Future.wait([
+      AppStorageController.to.isUserLoggedIn(),
+      Future.delayed(const Duration(milliseconds: 1500)),
+    ]);
+    final isLoggedIn = results[0] as bool;
+    if (isLoggedIn) {
       Get.offAllNamed(Routes.DASH_BOARD_PAGE);
     } else {
-      Get.offAndToNamed(Routes.LOGIN_PAGE);
+      Get.offAllNamed(Routes.LOGIN_PAGE);
     }
   }
 

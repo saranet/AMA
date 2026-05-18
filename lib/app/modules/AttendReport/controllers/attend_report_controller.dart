@@ -13,7 +13,7 @@ import 'package:ama/utils/helper_function.dart';
 import 'package:intl/intl.dart';
 
 class AttendReportController extends GetxController {
-  //TODO: Implement AttendReportController
+  static final _timeFormat = DateFormat("HH:mm:ss");
   var selectedDate = DateTime.now().obs;
   var attendenceLoading = true.obs, activityLoading = true.obs;
   var attendenceModel = Rxn<AttendenceModel?>(null);
@@ -63,7 +63,6 @@ class AttendReportController extends GetxController {
       AppStorageController.to.currentUser!.companyID!,
       selectedDate.value.toYYYMMDD,
     );
-    print("selectedDate.value.toYYYMMDD: ${selectedDate.value.toYYYMMDD}");
     ApiController.to
         .callGETAPI(
       url: url,
@@ -77,9 +76,6 @@ class AttendReportController extends GetxController {
       activityLoading.value = false;
       if (resp is Map<String, dynamic>) {
         if (resp['status'] == true) {
-          print("respYYYYYYY: $resp");
-          // attendenceModel.value = AttendenceModel.fromJson(
-          //resp['data'].first as Map<String, dynamic>);
           attendenceModel.value = AttendenceModel.fromJson(resp['data']);
 
           ///////get Activity Data ///////////////////
@@ -111,14 +107,12 @@ class AttendReportController extends GetxController {
     }
 
     Duration total = Duration.zero;
-    DateFormat format = DateFormat("HH:mm:ss");
-
     for (int i = 0;
         i < attendenceModel.value!.inTimes!.length &&
             i < attendenceModel.value!.outTimes!.length;
         i++) {
-      var inTime = format.parse(attendenceModel.value!.inTimes![i]);
-      var outTime = format.parse(attendenceModel.value!.outTimes![i]);
+      final inTime = _timeFormat.parse(attendenceModel.value!.inTimes![i]);
+      final outTime = _timeFormat.parse(attendenceModel.value!.outTimes![i]);
       total += outTime.difference(inTime);
     }
 

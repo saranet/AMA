@@ -38,7 +38,6 @@ class AllEmployesPageController extends GetxController {
     if (!isTeamLoading.value) {
       isTeamLoading.value = true;
     }
-    await AppStorageController.to.asyncCurrentUser;
     final resp = await ApiController.to
         .callGETAPI(
       url: APIUrlsService.to.fetchTeams(
@@ -51,7 +50,6 @@ class AllEmployesPageController extends GetxController {
         .catchError((e) {
       isTeamLoading.value = true;
     });
-    print("DEBUG RAW RESPONSE: $resp");
     if (resp != null && resp is Map) {
       if (resp['status'] == true && resp['data'] is List) {
         teams.clear();

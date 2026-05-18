@@ -3,17 +3,19 @@ import 'package:get/get.dart';
 import 'package:ama/app/models/teams_model.dart';
 import 'package:ama/data/app_enums.dart';
 import 'package:ama/data/controllers/app_storage_service.dart';
-import 'package:ama/data/models/user_data_model.dart';
 import 'package:ama/utils/app_extensions.dart';
 import 'package:ama/utils/theme/app_colors.dart';
 import 'package:ama/widgets/app_textfield.dart';
-
+import 'package:ama/l10n/app_localizations.dart';
 import '../controllers/all_employes_page_controller.dart';
 
 class AllEmployesPageView extends GetView<AllEmployesPageController> {
   const AllEmployesPageView({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -26,30 +28,27 @@ class AllEmployesPageView extends GetView<AllEmployesPageController> {
                 child: Row(
                   children: [
                     Text(
-                      "Attendance Report",
+                      l10n.attendanceReport,
                       style: Get.textTheme.headlineSmall,
                     ),
                     const Spacer(),
                     IconButton(
                         onPressed: controller.fetchAllTeams,
                         icon: const Icon(Icons.refresh)),
-                    FutureBuilder<UserDataModel?>(
-                      future: AppStorageController.to.asyncCurrentUser,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                                ConnectionState.waiting ||
-                            (snapshot.data?.roleType == UserRoleType.watcher) ||
-                            (snapshot.data?.roleType ==
-                                UserRoleType.employee) ||
-                            (snapshot.data?.roleType == UserRoleType.manager)) {
-                          return const SizedBox();
-                        }
-                        return IconButton(
-                          onPressed: addTeamDialog,
-                          icon: const Icon(Icons.people),
-                        );
-                      },
-                    )
+                    Builder(builder: (context) {
+                      final role =
+                          AppStorageController.to.currentUser?.roleType;
+                      if (role == UserRoleType.watcher ||
+                          role == UserRoleType.employee ||
+                          role == UserRoleType.manager ||
+                          role == null) {
+                        return const SizedBox();
+                      }
+                      return IconButton(
+                        onPressed: () => addTeamDialog(context),
+                        icon: const Icon(Icons.people),
+                      );
+                    })
                   ],
                 ),
               ),
@@ -57,7 +56,7 @@ class AllEmployesPageView extends GetView<AllEmployesPageController> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  "Department Employees List:",
+                  l10n.departmentEmployeesList,
                   style: Get.textTheme.titleMedium,
                 ),
               ),
@@ -68,13 +67,15 @@ class AllEmployesPageView extends GetView<AllEmployesPageController> {
                     return const Center(child: CircularProgressIndicator());
                   }
                   if (controller.teams.isEmpty) {
-                    return const Center(
-                      child: Text("No Teams Found"),
+                    return Center(
+                      child: Text(l10n.noTeamsFound),
                     );
                   }
-                  return Column(
-                    children: List.generate(controller.teams.length,
-                        (index) => _buildTeamItem(index)).toList(),
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: controller.teams.length,
+                    itemBuilder: (context, index) => _buildTeamItem(index),
                   );
                 },
               ),
@@ -86,26 +87,28 @@ class AllEmployesPageView extends GetView<AllEmployesPageController> {
     );
   }
 
-  void addTeamDialog() {
+  void addTeamDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     String teamname = "";
     Get.defaultDialog(
-      title: "Add Team",
+      title: l10n.addTeam,
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           AppTextField(
-            hintText: "Team Name",
+            hintText: l10n.teamName,
             onChanged: (p) => teamname = p,
           )
         ],
       ),
-      textCancel: "Cancel",
+      textCancel: l10n.cancel,
       onConfirm: () => controller.addTeam(teamname),
-      textConfirm: "Add Team",
+      textConfirm: l10n.addTeam,
     );
   }
 
-  void addMembersDialog() {
+  void addMembersDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     String fullName = "", username = "";
     UserRoleType selectedRole = UserRoleType.watcher;
     TeamsModel selectedTeam = controller.teams.first;
@@ -120,17 +123,17 @@ class AllEmployesPageView extends GetView<AllEmployesPageController> {
       list.removeWhere((element) => element == UserRoleType.admin.code);
     }
     Get.defaultDialog(
-      title: "Add Member",
+      title: l10n.addMember,
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           AppTextField(
-            hintText: "Full Name",
+            hintText: l10n.fullName,
             onChanged: (p) => fullName = p,
           ),
           8.height,
           AppTextField(
-            hintText: "Email",
+            hintText: l10n.email,
             onChanged: (p) => username = p,
           ),
           8.height,
@@ -173,9 +176,9 @@ class AllEmployesPageView extends GetView<AllEmployesPageController> {
           })
         ],
       ),
-      textCancel: "Cancel",
+      textCancel: l10n.cancel,
       onConfirm: () => controller.addMembers(fullName, username, selectedRole),
-      textConfirm: "Add Member",
+      textConfirm: l10n.addMember,
     );
   }
 
@@ -233,11 +236,6 @@ class AllEmployesPageView extends GetView<AllEmployesPageController> {
             Text(controller.members?.members?[index].fullName ?? "-"),
             Text(controller.members?.members?[index].userName ?? "-"),
             Text(controller.members?.members?[index].roleType ?? "-"),
-            // if (controller.members?.members?[index].id ==
-            //     controller.members?.manager?.id) ...[
-            //   6.height,
-            //   6.height,
-            // ]
           ],
         ),
       ),

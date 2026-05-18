@@ -1,19 +1,14 @@
-import 'package:ama/utils/helper_function.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import '../model/AllowedZone.dart';
 import 'ZoneStorageService.dart';
 import 'package:ama/data/controllers/api_url_service.dart';
 import 'package:ama/data/controllers/api_conntroller.dart';
-import 'package:ama/data/controllers/app_storage_service.dart';
 
 class AllowedZoneService extends GetxService {
   static AllowedZoneService get to => Get.find();
 
   final RxList<AllowedZone> allowedZones = <AllowedZone>[].obs;
-  final _box = GetStorage();
-  static const _lastRefreshKey = 'zones_last_refresh';
 
   @override
   void onInit() {
@@ -29,35 +24,17 @@ class AllowedZoneService extends GetxService {
   Future<void> loadZonesFromAPI() async {
     try {
       final url = APIUrlsService.to.allowedZones();
-      ApiController.to
-          .callGETAPI(
-        url: url,
-      )
-          .catchError((e) {
-        showErrorSnack(e.toString());
-      }).then((resp) {
-        if (resp != null && resp['status'] == true && resp['data'] != null) {
-          List data = resp['data'];
-          final zones = data
-              .map((e) => AllowedZone.fromJson(Map<String, dynamic>.from(e)))
-              .toList();
-          ZoneStorageService.saveZones(zones);
-          allowedZones.value = zones;
-          print(
-              "AllowedZoneService.loadZonesFromAPI: Loaded ${zones.length} zones");
-        }
-      });
-    } catch (e) {
-      print("AllowedZoneService.loadZonesFromAPI error: $e");
-    }
-  }
-
-  void _refreshZonesOncePerDay() {
-    final last = _box.read<String?>(_lastRefreshKey);
-    final today = DateTime.now().toIso8601String().substring(0, 10);
-    if (last != today) {
-      loadZonesFromAPI();
-      _box.write(_lastRefreshKey, today);
+      final resp = await ApiController.to.callGETAPI(url: url);
+      if (resp != null && resp['status'] == true && resp['data'] != null) {
+        final List data = resp['data'];
+        final zones = data
+            .map((e) => AllowedZone.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
+        ZoneStorageService.saveZones(zones);
+        allowedZones.value = zones;
+      }
+    } catch (_) {
+      // Silent failure — local zones loaded in onInit serve as fallback
     }
   }
 

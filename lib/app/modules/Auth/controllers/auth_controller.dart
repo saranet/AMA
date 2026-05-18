@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:ama/app/modules/LoginPage/controllers/login_page_controller.dart';
-import 'package:ama/app/routes/app_pages.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
@@ -16,23 +15,33 @@ class AuthController extends GetxController {
   final _storage = const FlutterSecureStorage();
   var isLoggedIn = false.obs;
 
-  Future<String> getDeviceId() async {
-    final deviceInfo = DeviceInfoPlugin();
-    if (Platform.isAndroid) {
-      final androidInfo = await deviceInfo.androidInfo;
-      return androidInfo.id; // unique Android ID
-    } else if (Platform.isIOS) {
-      final iosInfo = await deviceInfo.iosInfo;
-      return iosInfo.identifierForVendor ?? "unknown_ios";
-    }
-    return "unknown_device";
-  }
+  String? _cachedDeviceId;
 
   @override
   void onInit() {
     super.onInit();
     checkBiometricSupport();
-    //  hasSavedCredentials();
+    _prefetchDeviceId();
+  }
+
+  Future<void> _prefetchDeviceId() async {
+    _cachedDeviceId = await _fetchDeviceId();
+  }
+
+  Future<String> getDeviceId() async {
+    return _cachedDeviceId ?? await _fetchDeviceId();
+  }
+
+  Future<String> _fetchDeviceId() async {
+    final deviceInfo = DeviceInfoPlugin();
+    if (Platform.isAndroid) {
+      final androidInfo = await deviceInfo.androidInfo;
+      return androidInfo.id;
+    } else if (Platform.isIOS) {
+      final iosInfo = await deviceInfo.iosInfo;
+      return iosInfo.identifierForVendor ?? "unknown_ios";
+    }
+    return "unknown_device";
   }
 
   Future<void> checkBiometricSupport() async {
@@ -84,8 +93,6 @@ class AuthController extends GetxController {
         Get.snackbar("Error", "No saved credentials. Please login manually.");
         return;
       }
-      print("Biometric login for user: $username -- $password ");
-
       //  loginController.usernameTC.text = username;
       // loginController.passTC.text = password;
       final loginController = Get.find<LoginPageController>();
@@ -94,7 +101,6 @@ class AuthController extends GetxController {
         password: password,
       ); // uses updated login() with deviceId
     } catch (e) {
-      print("Error: $e");
       await _storage.deleteAll();
       Get.snackbar("Biometrics", "Error: $e");
     }
