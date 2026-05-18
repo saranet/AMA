@@ -20,7 +20,7 @@ class HomePageController extends GetxController {
   static final _timeFormat = DateFormat("HH:mm:ss");
   final authController = Get.find<AuthController>();
   bool available = false;
-  var selectedDate = DateTime.now().toUtc().add(const Duration(hours: 3)).obs;
+  var selectedDate = ServerTime.now.obs;
   var attendenceLoading = true.obs, activityLoading = true.obs;
   var attendenceModel = Rxn<AttendenceModel?>(null);
   var userActivityModel = Rxn<UserActivityModel?>(null);
@@ -29,7 +29,6 @@ class HomePageController extends GetxController {
   // ✅ Tracks if a swipe action is being processed (blocks duplicates)
   var isPerformingAction = false.obs;
 
-  var now = DateTime.now();
   final RxList<AllowedZone> allowedZones = <AllowedZone>[].obs;
   final zoneService = Get.find<AllowedZoneService>();
   final inAllowedArea = false.obs;
@@ -67,7 +66,7 @@ class HomePageController extends GetxController {
       return;
     }
 
-    final today = DateTime.now();
+    final today = ServerTime.now;
 
     // Parse server time string (UTC+3 Asia/Riyadh) → device local DateTime
     DateTime parseTime(String timeStr) {
@@ -75,9 +74,9 @@ class HomePageController extends GetxController {
       final h = int.parse(parts[0]);
       final m = int.parse(parts[1]);
       final s = parts.length > 2 ? int.parse(parts[2]) : 0;
-      // Build a UTC instant by treating the server value as UTC+3, then convert to local
+      // Build a UTC instant by treating the server value as server-local, then convert to device local
       return DateTime.utc(today.year, today.month, today.day, h, m, s)
-          .subtract(const Duration(hours: 3))
+          .subtract(ServerTime.offset)
           .toLocal();
     }
 
@@ -309,7 +308,7 @@ class HomePageController extends GetxController {
         return;
       }
 
-      final nowStr = DateTime.now().toHOUR24MINUTESECOND;
+      final nowStr = ServerTime.now.toHOUR24MINUTESECOND;
       var payload = {
         "activityID": userActivityModel.value?.activityID,
         "userID": AppStorageController.to.currentUser?.userID,
@@ -400,8 +399,9 @@ class HomePageController extends GetxController {
 
   int get countWorkingDays {
     int count = 0;
-    int currentYear = DateTime.now().year;
-    int currentMonth = DateTime.now().month;
+    final serverNow = ServerTime.now;
+    int currentYear = serverNow.year;
+    int currentMonth = serverNow.month;
 
     int totalDaysInMonth = DateTime(currentYear, currentMonth + 1, 0).day;
 

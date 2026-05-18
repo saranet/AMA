@@ -14,12 +14,11 @@ import 'package:intl/intl.dart';
 
 class AttendReportController extends GetxController {
   static final _timeFormat = DateFormat("HH:mm:ss");
-  var selectedDate = DateTime.now().toUtc().add(const Duration(hours: 3)).obs;
+  var selectedDate = ServerTime.now.obs;
   var attendenceLoading = true.obs, activityLoading = true.obs;
   var attendenceModel = Rxn<AttendenceModel?>(null);
   var userActivityModel = Rxn<UserActivityModel?>(null);
   var userPerformActivty = UserPerformActivty.IN.obs;
-  var now = DateTime.now();
   var workingTime = "".obs;
   Timer? _timer;
   final userId = Get.parameters['userId'];

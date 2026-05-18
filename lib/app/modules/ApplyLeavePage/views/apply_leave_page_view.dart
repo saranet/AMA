@@ -10,25 +10,27 @@ import 'package:ama/utils/theme/app_colors.dart';
 import 'package:ama/widgets/app_button.dart';
 import 'package:ama/widgets/app_textfield.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../controllers/apply_leave_page_controller.dart';
 
 class ApplyLeavePageView extends GetView<ApplyLeavePageController> {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           onPressed: controller.goBack,
           icon: const Icon(Icons.arrow_back),
         ),
-        title: const Text("Apply Leave"),
+        title: Text(AppLocalizations.of(context)!.applyLeave),
         centerTitle: true,
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
           16.height,
-          const Text("Select Leave Type"),
+          Text(AppLocalizations.of(context)!.selectLeaveType),
           StatefulBuilder(builder: (context, s) {
             return DropdownButton<String>(
               items: LeaveType.list
@@ -52,7 +54,7 @@ class ApplyLeavePageView extends GetView<ApplyLeavePageController> {
             return AppButton.appOutlineButtonRow(
               onPressed: () => openDatePickerdialog(true, context),
               label: controller.leaveStartDate.value?.toMMDDYYYY ??
-                  "Select start date",
+                  l10n.selectStartDate,
               suffixIcon: const Icon(
                 Icons.date_range,
                 color: AppColors.kBlue600,
@@ -64,7 +66,7 @@ class ApplyLeavePageView extends GetView<ApplyLeavePageController> {
             return AppButton.appOutlineButtonRow(
               onPressed: () => openDatePickerdialog(false, context),
               label: controller.leaveEndDate.value?.toMMDDYYYY ??
-                  "Select end date",
+                  l10n.selectEndDate,
               suffixIcon: const Icon(
                 Icons.date_range,
                 color: AppColors.kBlue600,
@@ -73,17 +75,17 @@ class ApplyLeavePageView extends GetView<ApplyLeavePageController> {
           }),
           24.height,
           AppTextField(
-            hintText: "Reason for leave",
+            hintText: AppLocalizations.of(context)!.reasonForLeave,
             controller: controller.leavereasonTC,
           ),
           24.height,
-          const Text("Select Approval Person"),
+          Text(AppLocalizations.of(context)!.selectApprovalPerson),
           Obx(() {
             if (controller.isTeamLoading.value) {
               return const UnconstrainedBox(child: CircularProgressIndicator());
             }
             if (controller.adminMembers.isEmpty) {
-              return const Text("No Admin Members Found");
+              return Text(AppLocalizations.of(context)!.noAdminMembersFound);
             }
             return DropdownButton<MembersData>(
               items: controller.adminMembers
@@ -104,7 +106,7 @@ class ApplyLeavePageView extends GetView<ApplyLeavePageController> {
           16.height,
           GradientButton(
             onPressed: controller.appllyLeave,
-            label: "Submit",
+            label: l10n.submit,
           )
         ],
       ),
@@ -113,23 +115,46 @@ class ApplyLeavePageView extends GetView<ApplyLeavePageController> {
 
   Future<void> openDatePickerdialog(
       bool isStartDate, BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     final companyworkingdays =
         workingDays(AppStorageController.to.currentUser?.wrokingDays ?? []);
 
-    final now = DateTime.now();
+    final now = ServerTime.now;
+
+    // ✅ Calculate firstDate (earliest selectable date)
+    final DateTime firstDate =
+        isStartDate ? now : (controller.leaveStartDate.value ?? now);
+
+    // ✅ Calculate desired initial date
+    DateTime initialDate = isStartDate
+        ? (controller.leaveStartDate.value ?? now)
+        : (controller.leaveEndDate.value ??
+            controller.leaveStartDate.value ??
+            now);
+
+    // ✅ Make sure initialDate is not before firstDate
+    if (initialDate.isBefore(firstDate)) {
+      initialDate = firstDate;
+    }
+
+    // ✅ If initialDate is not a working day, find the next valid working day
+    int safety = 0;
+    while (!companyworkingdays.contains(initialDate.weekday) && safety < 30) {
+      initialDate = initialDate.add(const Duration(days: 1));
+      safety++;
+    }
+
+    // ✅ Safety check — if no valid working day found, show error and exit
+    if (!companyworkingdays.contains(initialDate.weekday)) {
+      showErrorSnack(l10n.noWorkingDaysConfigured);
+      return;
+    }
 
     final DateTime? selectedDate = await showDatePicker(
       context: context,
-      firstDate: isStartDate
-          ? now // start date can't be before today
-          : controller.leaveStartDate.value ??
-              now, // end date can't be before start
+      firstDate: firstDate,
       lastDate: now.add(const Duration(days: 365 * 2)),
-      initialDate: isStartDate
-          ? (controller.leaveStartDate.value ?? now)
-          : (controller.leaveEndDate.value ??
-              controller.leaveStartDate.value ??
-              now),
+      initialDate: initialDate,
       selectableDayPredicate: (day) {
         return companyworkingdays.contains(day.weekday);
       },

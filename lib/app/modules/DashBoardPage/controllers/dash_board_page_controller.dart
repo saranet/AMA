@@ -96,7 +96,7 @@ class DashboardPageController extends GetxController {
       url: APIUrlsService.to.getDataByIDAndCompanyIdAndDate(
         AppStorageController.to.currentUser!.userID!,
         AppStorageController.to.currentUser!.companyID!,
-        DateTime.now().toYYYMMDD,
+        ServerTime.now.toYYYMMDD,
       ),
     )
         .catchError((e) {

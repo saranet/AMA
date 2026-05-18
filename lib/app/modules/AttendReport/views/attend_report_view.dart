@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../controllers/attend_report_controller.dart';
 
 class AttendReportView extends GetView<AttendReportController> {
@@ -21,7 +22,7 @@ class AttendReportView extends GetView<AttendReportController> {
           onPressed: controller.goBack,
           icon: const Icon(Icons.arrow_back),
         ),
-        title: const Text("Attendance Report"),
+        title: Text(AppLocalizations.of(context)!.attendanceReport),
         centerTitle: true,
       ),
       body: ListView(
@@ -62,8 +63,8 @@ class AttendReportView extends GetView<AttendReportController> {
             scrollDirection: Axis.horizontal,
             child: Obx(() {
               return HorizontalDate(
-                fromDate: DateTime.now(),
-                toDate: DateTime.now().subtract(const Duration(days: 10)),
+                fromDate: ServerTime.now,
+                toDate: ServerTime.now.subtract(const Duration(days: 10)),
                 selectedDate: controller.selectedDate.value,
                 onTap: controller.onDateChnged,
               );
@@ -74,7 +75,8 @@ class AttendReportView extends GetView<AttendReportController> {
           //? Your Activity View All
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Text("User Activity", style: Get.textTheme.headlineSmall),
+            child: Text(AppLocalizations.of(context)!.userActivity,
+                style: Get.textTheme.headlineSmall),
           ),
 
           20.height,

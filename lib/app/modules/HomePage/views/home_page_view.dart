@@ -61,8 +61,8 @@ class HomePageView extends GetView<HomePageController> {
             scrollDirection: Axis.horizontal,
             child: Obx(() {
               return HorizontalDate(
-                fromDate: DateTime.now(),
-                toDate: DateTime.now().subtract(const Duration(days: 10)),
+                fromDate: ServerTime.now,
+                toDate: ServerTime.now.subtract(const Duration(days: 10)),
                 selectedDate: controller.selectedDate.value,
                 onTap: controller.onDateChnged,
               );

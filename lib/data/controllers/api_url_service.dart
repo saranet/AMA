@@ -4,12 +4,12 @@ class APIUrlsService extends GetxService {
   static APIUrlsService to = Get.isRegistered<APIUrlsService>()
       ? Get.find<APIUrlsService>()
       : Get.put(APIUrlsService());
-  final String baseURL =
-      "http://alprofict.com:8080/attend_api/"; //for App localhost
-  //final String baseURL = "https://ama.deef.com:8232/"; // for web app localhost
+  // final String baseURL =
+  //   "http://alprofict.com:8080/attend_api/"; //for App localhost
+  final String baseURL = "https://ama.deef.com:8232/"; // for web app localhost
 
-  //final String baseURL =
-  //  "http://192.168.0.100/attend_api"; // for web app localhost
+  final String serverTime = "server_time.php";
+
   ////////// ?? AUTH          ??/////////////
 
   final String login = "signin.php";
@@ -20,7 +20,7 @@ class APIUrlsService extends GetxService {
 
   //////////////////?? Home Page API     ??////////////////
   final String add_shedule = "activity/add_schedule.php";
-  final String dailyInOut = "activity/dailyInOut.php";
+  final String dailyInOut = "activity/dailyInOut1.php";
   final String fetchBranches = "activity/fetch_Branches.php";
   String fetchDepts(String BranchID) =>
       "activity/fetch_Dept.php?BranchID=$BranchID";
@@ -35,7 +35,7 @@ class APIUrlsService extends GetxService {
     String compnayID,
     String date,
   ) =>
-      "activity/getDataByIDAndCompanyIdAndDate.php?id=$id&compnayID=$compnayID&date=$date";
+      "activity/getDataByIDAndCompanyIdAndDate1.php?id=$id&compnayID=$compnayID&date=$date";
   String getActivityList(
     String id,
     String compnayID,
