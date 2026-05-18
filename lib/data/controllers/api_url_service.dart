@@ -38,7 +38,7 @@ class APIUrlsService extends GetxService {
     String compnayID,
     String date,
   ) =>
-      "activity/activity/getActivityList?id=$id&compnayID=$compnayID&date=$date";
+      "activity/getActivityList.php?id=$id&compnayID=$compnayID&date=$date";
 
   //////////////?? HOLIDAY   ??/////////////
   String allHolidayByCompanyID(String compnayID) =>
