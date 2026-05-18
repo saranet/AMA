@@ -4,9 +4,12 @@ class APIUrlsService extends GetxService {
   static APIUrlsService to = Get.isRegistered<APIUrlsService>()
       ? Get.find<APIUrlsService>()
       : Get.put(APIUrlsService());
-  // final String baseURL = "http://10.0.2.2:1010/"; //for App localhost
-  final String baseURL = "https://ama.deef.com:8232/"; // for web app localhost
+  final String baseURL =
+      "http://alprofict.com:8080/attend_api/"; //for App localhost
+  //final String baseURL = "https://ama.deef.com:8232/"; // for web app localhost
 
+  //final String baseURL =
+  //  "http://192.168.0.100/attend_api"; // for web app localhost
   ////////// ?? AUTH          ??/////////////
 
   final String login = "signin.php";
