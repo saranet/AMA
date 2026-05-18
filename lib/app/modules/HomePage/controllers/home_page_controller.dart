@@ -69,17 +69,16 @@ class HomePageController extends GetxController {
 
     final today = DateTime.now();
 
-    // Parse times relative to TODAY's date (not 1970-01-01)
+    // Parse server time string (UTC+3 Asia/Riyadh) → device local DateTime
     DateTime parseTime(String timeStr) {
-      final parsed = _timeFormat.parse(timeStr);
-      return DateTime(
-        today.year,
-        today.month,
-        today.day,
-        parsed.hour,
-        parsed.minute,
-        parsed.second,
-      );
+      final parts = timeStr.split(':');
+      final h = int.parse(parts[0]);
+      final m = int.parse(parts[1]);
+      final s = parts.length > 2 ? int.parse(parts[2]) : 0;
+      // Build a UTC instant by treating the server value as UTC+3, then convert to local
+      return DateTime.utc(today.year, today.month, today.day, h, m, s)
+          .subtract(const Duration(hours: 3))
+          .toLocal();
     }
 
     Duration totalWorking = Duration.zero;
