@@ -23,6 +23,7 @@ class UserDataModel {
   bool? employeeApproved;
   String? rejectedReason;
   String? branchName;
+  String? password;
   UserDataModel(
       {this.userID,
       this.companyID,
@@ -43,37 +44,38 @@ class UserDataModel {
       this.rejectedReason,
       this.departmentID,
       this.departmentName,
-      this.branchName});
+      this.branchName,
+      this.password});
 
   UserDataModel.fromJson(Map<String, dynamic> json) {
-    userID = json['id'];
-    companyID = json['Branch_id'];
-    departmentID = json['departmentID'];
-    departmentName = json['departmentName'];
-    adminID = json['adminID'];
-    username = json['email'];
-    fullName = json['name'];
-    createdAt = json['createdAt'];
-    branchName = json['branchName'];
+    userID = json['id']?.toString();
+    companyID = json['Branch_id']?.toString();
+    departmentID = json['departmentID']?.toString();
+    departmentName = json['departmentName']?.toString();
+    adminID = json['adminID']?.toString();
+    username = json['email']?.toString();
+    fullName = json['name']?.toString();
+    createdAt = json['createdAt']?.toString();
+    branchName = json['branchName']?.toString();
     if (json['position'] != null) {
-      roleType = UserRoleType.fromString(json['position']);
+      roleType = UserRoleType.fromString(json['position'].toString());
     }
-    totalLeaveBalance = int.tryParse(json['totalLeaveBalance'].toString());
-    totalLeaveApproved = int.tryParse(json['totalLeaveApproved'].toString());
-    totalLeavePending = int.tryParse(json['totalLeavePending'].toString());
-    totalLeaveCancelled = int.tryParse(json['totalLeaveCancelled'].toString());
-    companyName = json['CompanyName'];
+    totalLeaveBalance = int.tryParse(json['totalLeaveBalance']?.toString() ?? '0');
+    totalLeaveApproved = int.tryParse(json['totalLeaveApproved']?.toString() ?? '0');
+    totalLeavePending = int.tryParse(json['totalLeavePending']?.toString() ?? '0');
+    totalLeaveCancelled = int.tryParse(json['totalLeaveCancelled']?.toString() ?? '0');
+    companyName = json['CompanyName']?.toString();
     if (json['wrokingDays'] != null) {
-      final decoded = jsonDecode(json['wrokingDays']) ?? '';
+      final raw = json['wrokingDays'];
+      final decoded = raw is String ? jsonDecode(raw) : raw;
       if (decoded is List) {
         wrokingDays = decoded.map((e) => e.toString()).toList();
       }
     }
-    inTime = json['inTime'];
-    outTime = json['outTime'];
-    employeeApproved =
-        json['employeeApproved'].toString() == '1' ? true : false;
-    rejectedReason = json['rejectedReason'];
+    inTime = json['inTime']?.toString();
+    outTime = json['outTime']?.toString();
+    employeeApproved = json['employeeApproved']?.toString() == '1';
+    rejectedReason = json['rejectedReason']?.toString();
   }
 
   Map<String, dynamic> toJson() {
