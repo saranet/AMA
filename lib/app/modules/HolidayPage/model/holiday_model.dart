@@ -6,9 +6,9 @@ class HolidayModel {
   HolidayModel({this.id, this.holidayDate, this.label});
 
   HolidayModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    holidayDate = json['holidayDate'];
-    label = json['label'];
+    id = json['id']?.toString();
+    holidayDate = json['holidayDate']?.toString();
+    label = json['label']?.toString();
   }
 
   Map<String, dynamic> toJson() {

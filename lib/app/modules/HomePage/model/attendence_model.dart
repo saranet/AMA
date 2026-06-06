@@ -22,9 +22,9 @@ class AttendenceModel {
   });
 
   AttendenceModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    userID = json['userID'];
-    companyID = json['companyID'];
+    id = json['id']?.toString();
+    userID = json['userID']?.toString();
+    companyID = json['companyID']?.toString();
     // Handle inTimes
     if (json['inTime'] != null) {
       if (json['inTime'] is String) {
@@ -62,7 +62,7 @@ class AttendenceModel {
             (json['breakOutTimes'] as List).map((e) => e.toString()).toList();
       }
     }
-    createdAt = json['createdAt'];
+    createdAt = json['createdAt']?.toString();
   }
 
   Map<String, dynamic> toJson() {

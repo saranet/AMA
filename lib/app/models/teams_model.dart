@@ -6,9 +6,9 @@ class TeamsModel {
   TeamsModel({this.id, this.createdAt, this.teamName});
 
   TeamsModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    createdAt = json['createdAt'];
-    teamName = json['fullName'];
+    id = json['id']?.toString();
+    createdAt = json['createdAt']?.toString();
+    teamName = json['fullName']?.toString();
   }
 
   Map<String, dynamic> toJson() {

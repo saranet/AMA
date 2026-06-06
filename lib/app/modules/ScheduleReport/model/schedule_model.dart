@@ -25,23 +25,28 @@ class ScheduleModel {
   });
 
   ScheduleModel.fromJson(Map<String, dynamic> json) {
-    id = json['schedule_id'];
-    slug = json['slug'];
+    id = json['schedule_id']?.toString();
+    slug = json['slug']?.toString();
 
     if (json['emp_name'] != null) {
-      usersName = jsonDecode(json['emp_name']).cast<String>();
+      final raw = json['emp_name'];
+      final decoded = raw is String ? jsonDecode(raw) : raw;
+      if (decoded is List) usersName = decoded.map((e) => e.toString()).toList();
     }
     if (json['emp_id'] != null) {
-      usersID = jsonDecode(json['emp_id']).cast<String>();
+      final raw = json['emp_id'];
+      final decoded = raw is String ? jsonDecode(raw) : raw;
+      if (decoded is List) usersID = decoded.map((e) => e.toString()).toList();
     }
-    // companyID = json['companyID'];
-    inTime = json['time_in'];
-    outTime = json['time_out'];
+    inTime = json['time_in']?.toString();
+    outTime = json['time_out']?.toString();
     if (json['wrokingDays'] != null) {
-      workingDays = jsonDecode(json['wrokingDays']).cast<String>();
+      final raw = json['wrokingDays'];
+      final decoded = raw is String ? jsonDecode(raw) : raw;
+      if (decoded is List) workingDays = decoded.map((e) => e.toString()).toList();
     }
-    created_by = json['created_by'];
-    created_at = json['created_at'];
+    created_by = json['created_by']?.toString();
+    created_at = json['created_at']?.toString();
   }
 
   Map<String, dynamic> toJson() {

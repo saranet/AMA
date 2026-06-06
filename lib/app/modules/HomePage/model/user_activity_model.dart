@@ -1,3 +1,7 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../../../../l10n/app_localizations.dart';
+
 class UserActivityModel {
   String? activityID;
   String? createdAt;
@@ -17,10 +21,9 @@ class UserActivityModel {
   });
 
   UserActivityModel.fromJson(Map<String, dynamic> json) {
-    activityID = json['activityID'];
-    createdAt = json['date'];
+    activityID = json['activityID']?.toString();
+    createdAt = json['date']?.toString();
 
-    // Safe parse for checkIn (handle map or list)
     final checkInData = json['checkIn'];
     if (checkInData is List) {
       checkIn = checkInData.map((e) => CheckIn.fromJson(e)).toList();
@@ -28,7 +31,6 @@ class UserActivityModel {
       checkIn = [CheckIn.fromJson(Map<String, dynamic>.from(checkInData))];
     }
 
-    // Safe parse for outTime (handle map or list)
     final outTimeData = json['outTime'];
     if (outTimeData is List) {
       outTime = outTimeData.map((e) => OutTime.fromJson(e)).toList();
@@ -36,7 +38,6 @@ class UserActivityModel {
       outTime = [OutTime.fromJson(Map<String, dynamic>.from(outTimeData))];
     }
 
-    // Break times
     breakInTime =
         (json['breakInTime'] as List?)?.map((e) => e.toString()).toList();
     breakOutTime =
@@ -66,8 +67,8 @@ class CheckIn {
   CheckIn({this.inTime, this.msg});
 
   CheckIn.fromJson(Map<String, dynamic> json) {
-    inTime = json['inTime'];
-    msg = json['msg'];
+    inTime = json['inTime']?.toString();
+    msg = json['msg']?.toString();
   }
 
   Map<String, dynamic> toJson() => {
@@ -83,8 +84,8 @@ class OutTime {
   OutTime({this.outTime, this.msg});
 
   OutTime.fromJson(Map<String, dynamic> json) {
-    outTime = json['outTime'];
-    msg = json['msg'];
+    outTime = json['outTime']?.toString();
+    msg = json['msg']?.toString();
   }
 
   Map<String, dynamic> toJson() => {
@@ -97,14 +98,16 @@ enum UserPerformActivty {
   IN,
   OUT,
   BREAKIN,
-  BREAKOUT; // name => BREAKOUT
+  BREAKOUT;
 
+  // Using Get.context means no parameter needed — just use activity.label
   String get label {
+    final l10n = AppLocalizations.of(Get.context!)!;
     return switch (this) {
-      IN => "Swipe to Check in.",
-      BREAKIN => "Swipe to Break in.",
-      BREAKOUT => "Swipe to Break out.",
-      OUT => "Swipe to Check out.",
+      IN => l10n.swipeToCheckIn,
+      BREAKIN => l10n.swipeToBreakIn,
+      BREAKOUT => l10n.swipeToBreakOut,
+      OUT => l10n.swipeToCheckOut,
     };
   }
 }

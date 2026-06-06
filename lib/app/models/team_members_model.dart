@@ -39,11 +39,11 @@ class MembersData {
       {this.id, this.userName, this.fullName, this.createdAt, this.roleType});
 
   MembersData.fromJson(Map<String, dynamic> json) {
-    id = json['id'].toString();
-    userName = json['userName'];
-    fullName = json['fullName'];
-    createdAt = json['createdAt'];
-    roleType = json['roleType'];
+    id = json['id']?.toString();
+    userName = json['userName']?.toString();
+    fullName = json['fullName']?.toString();
+    createdAt = json['createdAt']?.toString();
+    roleType = json['roleType']?.toString();
   }
 
   Map<String, dynamic> toJson() {
