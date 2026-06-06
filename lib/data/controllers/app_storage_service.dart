@@ -46,10 +46,14 @@ class AppStorageController extends GetxService {
   }
 
   Future<UserDataModel?> get asyncCurrentUser async {
-    var data = await userDataBox.read(userDataKey) as Map<String, dynamic>?;
-    if (data != null) {
+    try {
+      final raw = userDataBox.read(userDataKey);
+      if (raw == null) return null;
+      final data = raw is Map<String, dynamic>
+          ? raw
+          : Map<String, dynamic>.from(raw as Map);
       return UserDataModel.fromJson(data);
-    } else {
+    } catch (_) {
       return null;
     }
   }

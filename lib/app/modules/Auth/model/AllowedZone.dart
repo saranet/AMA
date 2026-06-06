@@ -7,9 +7,9 @@ class AllowedZone {
 
   factory AllowedZone.fromJson(Map<String, dynamic> json) {
     return AllowedZone(
-      lat: double.parse(json['latitude'] as String),
-      lng: double.parse(json['longitude'] as String),
-      radius: double.parse(json['distance'] as String),
+      lat: double.tryParse(json['latitude']?.toString() ?? '0') ?? 0,
+      lng: double.tryParse(json['longitude']?.toString() ?? '0') ?? 0,
+      radius: double.tryParse(json['distance']?.toString() ?? '0') ?? 0,
     );
   }
 

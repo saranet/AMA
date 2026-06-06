@@ -15,6 +15,8 @@ import 'package:ama/utils/helper_function.dart';
 import 'package:ama/widgets/app_textfield.dart';
 import 'package:local_auth/local_auth.dart';
 
+import '../../../../l10n/app_localizations.dart';
+
 class LoginPageController extends GetxController {
   String get appImageLogo => AppImages.appLogo;
   var usernameTC = TextEditingController(), passTC = TextEditingController();
@@ -22,6 +24,10 @@ class LoginPageController extends GetxController {
   final LocalAuthentication auth = LocalAuthentication();
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   var isLoading = false.obs;
+
+  // Shortcut to access translations anywhere in this controller
+  AppLocalizations get l10n => AppLocalizations.of(Get.context!)!;
+
   @override
   void onInit() {
     super.onInit();
@@ -45,8 +51,8 @@ class LoginPageController extends GetxController {
 
       // get deviceId for multi-login restriction
       final deviceId = await Get.find<AuthController>().getDeviceId();
-      print("Device ID: $deviceId");
-      print("*************************Login Password: $pass");
+      //print("Device ID: $deviceId");
+      //print("*************************Login Password: $pass");
       ApiController.to.callPOSTAPI(
         url: APIUrlsService.to.login,
         body: {
@@ -56,29 +62,27 @@ class LoginPageController extends GetxController {
         },
       ).then((resp) async {
         isLoading.value = false;
-        // if (resp is Map<String, dynamic>) {
-        // resp = jsonDecode(resp);
         if (resp['status'] == true) {
-          if (resp['message'].toString() == "Please set new password.") {
+          if (resp['message']?.toString() == "Please set new password.") {
             showResetPasswordDialog();
           } else {
-            await AppStorageController.to
-                .login(resp['data'] as Map<String, dynamic>);
+            final data = resp['data'];
+            if (data is! Map<String, dynamic>) {
+              showErrorSnack(l10n.unknownError);
+              return;
+            }
+            await AppStorageController.to.login(data);
 
             // Save credentials for biometric login
             if (username == null && password == null) {
               await secureStorage.write(key: 'username', value: user);
               await secureStorage.write(key: 'password', value: pass);
             }
-            showSuccessSnack("User Logged.");
+            showSuccessSnack(l10n.userLogged);
           }
         } else {
-          showErrorSnack(resp['errorMsg']?.toString() ?? "Unknown error.");
+          showErrorSnack(resp['errorMsg']?.toString() ?? l10n.unknownError);
         }
-        /* } else {
-          isLoading.value = false;
-          showErrorSnack("Invalid API response format.");
-        }*/
       }).catchError((e) {
         isLoading.value = false;
         if (e is Map<String, dynamic> &&
@@ -97,42 +101,39 @@ class LoginPageController extends GetxController {
     isLoading.value = false;
     String password = "", renterPassword = "";
     Get.defaultDialog(
-      title: "Set New Password",
+      title: l10n.setNewPassword,
       barrierDismissible: false,
       content: Column(
         children: [
           24.height,
           AppTextField(
-            hintText: "Enter new password",
+            hintText: l10n.enterNewPassword,
             onChanged: (p) => password = p,
           ),
           24.height,
           AppTextField(
-            hintText: "Re-Enter new password",
+            hintText: l10n.reenterNewPassword,
             onChanged: (p) => renterPassword = p,
           ),
           24.height,
         ],
       ),
-      textCancel: "Cancel",
+      textCancel: l10n.cancel,
       onCancel: closeDialogs,
-      textConfirm: "Update Password",
+      textConfirm: l10n.updatePassword,
       onConfirm: () async {
         if (renterPassword.trim().isEmpty || password != renterPassword) {
-          showErrorSnack("Please enter corrent passowrd");
+          showErrorSnack(l10n.pleaseEnterCorrectPassword);
           return;
         }
         final resp = await ApiController.to.callGETAPI(
           url: APIUrlsService.to
               .updatePassword(usernameTC.text, passTC.text, renterPassword),
         );
-        //print("*****************Update Password Response: $resp");
         if (resp['status'] == true) {
-          // print("*****************Update : $resp['status'] ");
           passTC.text = renterPassword;
           Get.back();
-          showSuccessSnack(
-              "Password updated successfully. Please login again.");
+          showSuccessSnack(l10n.passwordUpdatedSuccessfullyPleaseLoginAgain);
         }
       },
     );

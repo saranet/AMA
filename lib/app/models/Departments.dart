@@ -6,8 +6,8 @@ class Departments {
 
   factory Departments.fromJson(Map<String, dynamic> json) {
     return Departments(
-      id: int.parse(json['id'].toString()),
-      name: json['title'],
+      id: int.tryParse(json['id']?.toString() ?? '0') ?? 0,
+      name: json['title']?.toString() ?? '',
     );
   }
 }

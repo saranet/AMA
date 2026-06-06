@@ -14,7 +14,9 @@ class AllowedZoneService extends GetxService {
   void onInit() {
     super.onInit();
     // load local immediately
-    allowedZones.value = ZoneStorageService.loadZones();
+    try {
+      allowedZones.value = ZoneStorageService.loadZones();
+    } catch (_) {}
     // fetch remote (silent)
     loadZonesFromAPI();
     // daily refresh
