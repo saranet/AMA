@@ -40,12 +40,26 @@ class AllowedZoneService extends GetxService {
     }
   }
 
+  /// Returns true if [position] falls inside any allowed zone.
+  ///
+  /// The GPS fix carries an `accuracy` value (the radius, in metres, of 68%
+  /// confidence). We subtract that from the measured distance so a reading
+  /// that is *probably* inside the zone — but reported imprecisely, as is
+  /// common on iOS — is not rejected. The buffer is capped so a wildly
+  /// inaccurate fix (e.g. when "Precise Location" is off) can't wave the user
+  /// through from kilometres away.
   bool isWithinAllowedZone(Position position) {
     if (allowedZones.isEmpty) return false;
+
+    // Cap how much slack a single fix can earn (metres).
+    const double maxAccuracyBuffer = 100.0;
+    final double buffer =
+        position.accuracy.clamp(0.0, maxAccuracyBuffer).toDouble();
+
     for (final z in allowedZones) {
       final d = Geolocator.distanceBetween(
           position.latitude, position.longitude, z.lat, z.lng);
-      if (d <= z.radius) return true;
+      if (d - buffer <= z.radius) return true;
     }
     return false;
   }

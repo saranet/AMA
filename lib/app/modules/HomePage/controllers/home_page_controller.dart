@@ -41,6 +41,9 @@ class HomePageController extends GetxController {
   DateTime? _lastPositionTime;
   static const _positionCacheDuration = Duration(seconds: 30);
 
+  // ✅ Live GPS warm-up: keeps the cache hot so a swipe never waits for a fix
+  StreamSubscription<Position>? _positionStreamSub;
+
   AppLocalizations get l10n => AppLocalizations.of(Get.context!)!;
 
   @override
@@ -53,6 +56,42 @@ class HomePageController extends GetxController {
   void onReady() {
     super.onReady();
     getAllData();
+    _startLocationWarmup();
+  }
+
+  /// Keep a live GPS fix warm while the home screen is open.
+  ///
+  /// Every emitted position refreshes the cache, so by the time the user
+  /// swipes to check in/out the location is already available — the swipe is
+  /// an instant cache hit instead of waiting 2–4s for a fresh fix. The
+  /// `distanceFilter` keeps it cheap: the OS only delivers an update when the
+  /// device actually moves ~5m.
+  Future<void> _startLocationWarmup() async {
+    try {
+      if (!await Geolocator.isLocationServiceEnabled()) return;
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        return;
+      }
+
+      _positionStreamSub?.cancel();
+      _positionStreamSub = Geolocator.getPositionStream(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          distanceFilter: 5,
+        ),
+      ).listen((pos) {
+        _lastKnownPosition = pos;
+        _lastPositionTime = DateTime.now();
+        inAllowedArea.value = zoneService.isWithinAllowedZone(pos);
+      }, onError: (_) {});
+    } catch (_) {
+      // Warm-up is best-effort; performInOut still fetches on demand.
+    }
   }
 
   // ── TIMER (FIXED — no more 1-hour offset) ──────────────────────────────────
@@ -265,12 +304,19 @@ class HomePageController extends GetxController {
 
   // ── PERFORM IN/OUT (FAST + DUPLICATE-PROOF) ───────────────────────────────
 
-  /// Get GPS position fast — uses 30-second cache
+  /// Get GPS position fast — uses 30-second cache.
+  ///
+  /// A cached fix is only reused if it is both fresh *and* reasonably precise.
+  /// Reusing a coarse fix (e.g. the fast Wi-Fi/cell fix iOS returns first) is
+  /// what causes intermittent false "outside zone" errors.
+  static const double _maxCachedAccuracy = 50.0; // metres
+
   Future<Position?> _getCachedPosition() async {
     if (_lastKnownPosition != null && _lastPositionTime != null) {
       final age = DateTime.now().difference(_lastPositionTime!);
-      if (age < _positionCacheDuration) {
-          return _lastKnownPosition;
+      if (age < _positionCacheDuration &&
+          _lastKnownPosition!.accuracy <= _maxCachedAccuracy) {
+        return _lastKnownPosition;
       }
     }
 
@@ -295,6 +341,7 @@ class HomePageController extends GetxController {
       // ✅ Use cached GPS to skip 1-2 second wait
       final position = await _getCachedPosition();
       if (position == null) {
+        showErrorSnack(l10n.locationServicesAreDisabled);
         return;
       }
 
@@ -394,6 +441,7 @@ class HomePageController extends GetxController {
   @override
   void onClose() {
     stopTimer();
+    _positionStreamSub?.cancel();
     super.onClose();
   }
 
@@ -439,9 +487,20 @@ class HomePageController extends GetxController {
       return null;
     }
 
-    return await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.medium,
-        timeLimit: const Duration(seconds: 10));
+    // Use the highest accuracy and give iOS enough time for a cold-start GPS
+    // fix. A medium-accuracy fix on iOS can be ~100m off and falsely push the
+    // user outside the attendance zone.
+    try {
+      return await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+          timeLimit: const Duration(seconds: 20));
+    } on TimeoutException {
+      // Cold-start GPS didn't fix in time — fall back to the last cached OS
+      // position instead of failing the attendance silently.
+      return await Geolocator.getLastKnownPosition();
+    } catch (e) {
+      return await Geolocator.getLastKnownPosition();
+    }
   }
 
   Future<void> checkUserLocation() async {
