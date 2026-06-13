@@ -5,8 +5,11 @@ dependencies:
   device_info_plus: ^9.0.0
   flutter:
     sdk: flutter
+  flutter_gen: ^5.13.0+1
+  flutter_launcher_icons: ^0.14.4
   flutter_localizations:
     sdk: flutter
+  flutter_native_splash: ^2.4.4
   flutter_secure_storage: ^9.2.4
   geolocator: ^10.1.0
   get: ^4.6.6
@@ -27,6 +30,16 @@ flutter:
     - assets/
   generate: true
   uses-material-design: true
+flutter_launcher_icons:
+  android: true
+  image_path: assets/app_logo.png
+  ios: true
+  remove_alpha_ios: true
+flutter_native_splash:
+  android: true
+  color: '#ffffff'
+  image: assets/app_logo.png
+  ios: true
 name: ama
 publish_to: none
-version: 1.0.0+2
+version: 1.0.0+4
