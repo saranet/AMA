@@ -1,5 +1,6 @@
 import 'package:ama/widgets/GradientButton.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:get/get.dart';
 import 'package:ama/data/app_enums.dart';
@@ -13,46 +14,50 @@ import 'package:ama/utils/theme/app_theme.dart';
 import 'package:ama/widgets/app_button.dart';
 import 'package:ama/widgets/app_textfield.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../controllers/profile_page_controller.dart';
 
 class ProfilePageView extends GetView<ProfilePageController> {
   const ProfilePageView({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: ListView(
-        padding: EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
           30.height,
-          title("User Details", Icons.person),
+          title(l10n.userDetails, Icons.person),
           16.height,
-          title("Full Name", Icons.person),
+          title(l10n.fullName, Icons.person),
           AppTextField(
-            hintText: "Full Name",
+            hintText: l10n.fullName,
             controller: TextEditingController(
               text: AppStorageController.to.currentUser!.fullName ?? '',
             ),
             readOnly: true,
           ),
-          title("User Name", Icons.person),
+          title(l10n.userName, Icons.person),
           AppTextField(
-            hintText: "User Name",
+            hintText: l10n.userName,
             controller: TextEditingController(
               text: controller.userName.text,
             ),
             readOnly: true,
           ),
-          title("Branch Details", Icons.person),
+          title(l10n.branchDetails, Icons.person),
           AppTextField(
-            hintText: "Branch Name",
+            hintText: l10n.branchName,
             controller: TextEditingController(
               text: AppStorageController.to.currentUser!.branchName ?? '',
             ),
             readOnly: true,
           ),
-          title("Department Details", Icons.badge_outlined),
+          title(l10n.departmentDetails, Icons.badge_outlined),
           AppTextField(
-            hintText: "Department Name",
+            hintText: l10n.departmentName,
             controller: TextEditingController(
               text: AppStorageController.to.currentUser!.departmentName ?? '',
             ),
@@ -60,14 +65,14 @@ class ProfilePageView extends GetView<ProfilePageController> {
           ),
           16.height,
           GradientButton(
-            onPressed: showResetPasswordDialog,
-            label: "Update Password",
+            onPressed: () => showResetPasswordDialog(context),
+            label: l10n.updatePassword,
           ),
           16.height,
           GradientButton(
             padding: const EdgeInsets.all(10.0),
             onPressed: AppStorageController.to.logout,
-            label: "Log out",
+            label: l10n.logOut,
           ),
           if (AppStorageController.to.currentUser?.roleType ==
               UserRoleType.superAdmin) ...[
@@ -79,94 +84,87 @@ class ProfilePageView extends GetView<ProfilePageController> {
     );
   }
 
-/*void showResetPasswordDialog() {
-    isLoading.value = false;
+  Future<void> showResetPasswordDialog(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+
     String password = "", renterPassword = "";
+    bool isProcessing = false;
+    final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+
+// Read in an async function
+    String? old_pass = await secureStorage.read(key: 'password');
     Get.defaultDialog(
-      title: "Set New Password",
+      title: l10n.setNewPassword,
       barrierDismissible: false,
       content: Column(
         children: [
           24.height,
           AppTextField(
-            hintText: "Enter new password",
+            hintText: l10n.enterNewPassword,
             onChanged: (p) => password = p,
           ),
           24.height,
           AppTextField(
-            hintText: "Re-Enter new password",
+            hintText: l10n.reenterNewPassword,
             onChanged: (p) => renterPassword = p,
           ),
           24.height,
         ],
       ),
-      textCancel: "Cancel",
+      textCancel: l10n.cancel,
       onCancel: closeDialogs,
-      textConfirm: "Update Password",
+      textConfirm: l10n.updatePassword,
       onConfirm: () async {
-        if (renterPassword.trim().isEmpty || password != renterPassword) {
-          showErrorSnack("Please enter corrent passowrd");
+        // ✅ Prevent double-tap
+        if (isProcessing) return;
+
+        // ✅ Better validation
+        if (password.trim().isEmpty) {
+          showErrorSnack(l10n.enterNewPassword);
           return;
         }
-        final resp = await ApiController.to.callGETAPI(
-          url: APIUrlsService.to
-              .updatePassword(usernameTC.text, passTC.text, renterPassword),
-        );
-        //print("*****************Update Password Response: $resp");
-        if (resp['status'] == true) {
-          // print("*****************Update : $resp['status'] ");
-          passTC.text = renterPassword;
-          Get.back();
-          showSuccessSnack(
-              "Password updated successfully. Please login again.");
-        }
-      },
-    );
-  }*/
-
-  void showResetPasswordDialog() {
-    String oldPassWord = "", newPassword = "";
-    Get.defaultDialog(
-      title: "Set New Password",
-      barrierDismissible: false,
-      content: Column(
-        children: [
-          24.height,
-          AppTextField(
-            hintText: "Enter Old password",
-            onChanged: (p) => oldPassWord = p,
-          ),
-          24.height,
-          AppTextField(
-            hintText: "enter new password",
-            onChanged: (p) => newPassword = p,
-          ),
-          24.height,
-        ],
-      ),
-      textCancel: "Cancel",
-      onCancel: closeDialogs,
-      textConfirm: "Update Password",
-      onConfirm: () async {
-        if (oldPassWord.trim().isEmpty || newPassword.trim().isEmpty) {
-          showErrorSnack("Please enter old Password and New Password");
+        if (renterPassword.trim().isEmpty) {
+          showErrorSnack(l10n.reenterNewPassword);
           return;
         }
-        final resp = await ApiController.to.callGETAPI(
-          url: APIUrlsService.to.updatePassword(
-            controller.userName.text,
-            oldPassWord,
-            newPassword,
-          ),
-        );
+        if (password.trim() != renterPassword.trim()) {
+          showErrorSnack(l10n.pleaseEnterCorrectPassword);
+          return;
+        }
 
-        if (resp is Map<String, dynamic>) {
-          if (resp['status']) {
-            closeDialogs();
-            showSuccessSnack("Password updated");
+        isProcessing = true;
+        print('passssssssssssssss: $old_pass');
+
+        try {
+          final resp = await ApiController.to.callGETAPI(
+            url: APIUrlsService.to.updatePassword(
+              controller.userName.text,
+              old_pass ?? "",
+              renterPassword,
+            ),
+          );
+
+          print('🔐 API response: $resp');
+
+          // ✅ Handle ALL possible response cases
+          if (resp != null &&
+              resp is Map<String, dynamic> &&
+              resp['status'] == true) {
+            Get.back(); // close the dialog
+            showSuccessSnack(l10n.passwordUpdatedSuccessfullyPleaseLoginAgain);
           } else {
-            showSuccessSnack(resp['errorMsg'] ?? resp.toString());
+            // ✅ Show the actual error from the server
+            final errorMsg = (resp is Map && resp['errorMsg'] != null)
+                ? resp['errorMsg'].toString()
+                : l10n.unknownError;
+            showErrorSnack(errorMsg);
           }
+        } catch (e) {
+          // ✅ Catch network/parse errors
+          print('🔐 Error: $e');
+          showErrorSnack(e.toString());
+        } finally {
+          isProcessing = false;
         }
       },
     );
@@ -210,16 +208,17 @@ class ProfilePageView extends GetView<ProfilePageController> {
   }
 
   Widget organizationDetails(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
-        title("Organization Details", Icons.people_alt_outlined),
+        title(l10n.organizationDetails, Icons.people_alt_outlined),
         16.height,
         AppTextField(
-          hintText: "Organization Name",
+          hintText: l10n.organizationName,
           controller: controller.organizationTC,
           validator: (val) {
             if (val?.isEmpty ?? true) {
-              return "This field can't be empty";
+              return l10n.thisFieldCantBeEmpty;
             } else {
               return null;
             }
@@ -230,7 +229,7 @@ class ProfilePageView extends GetView<ProfilePageController> {
           return AppButton.appOutlineButtonRow(
             onPressed: () => openTimePickerdialog(true, context),
             label: controller.startTime.value == null
-                ? "Select start time"
+                ? l10n.selectStartTime
                 : formatTimeOfDay(controller.startTime.value!),
             suffixIcon: const Icon(
               Icons.access_time_outlined,
@@ -243,7 +242,7 @@ class ProfilePageView extends GetView<ProfilePageController> {
           return AppButton.appOutlineButtonRow(
             onPressed: () => openTimePickerdialog(false, context),
             label: controller.endTime.value == null
-                ? "Select end time"
+                ? l10n.selectEndTime
                 : formatTimeOfDay(controller.endTime.value!),
             suffixIcon: const Icon(
               Icons.access_time_outlined,
@@ -286,7 +285,7 @@ class ProfilePageView extends GetView<ProfilePageController> {
         16.height,
         FilledButton(
           onPressed: controller.updateCompany,
-          child: Text("Update Organization"),
+          child: Text(l10n.updateOrganization),
         ),
         50.height,
       ],

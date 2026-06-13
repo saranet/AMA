@@ -14,6 +14,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_state_manager/src/simple/get_view.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../models/team_members_model.dart';
 import '../../../models/teams_model.dart';
 
@@ -27,7 +28,7 @@ class SchedulesPageView extends GetView<SchedulesPageController> {
           onPressed: controller.goBack,
           icon: const Icon(Icons.arrow_back),
         ),
-        title: const Text('Add Schedule'),
+        title: Text(AppLocalizations.of(context)!.addSchedule),
         actions: [
           IconButton.outlined(
             onPressed: () {}, //controller.getAllLeaves,
@@ -46,7 +47,7 @@ class SchedulesPageView extends GetView<SchedulesPageController> {
                 children: [
                   16.height,
                   AppTextField(
-                    hintText: "Schedule Name",
+                    hintText: AppLocalizations.of(context)!.scheduleName,
                     controller: controller.scheduleNameTC,
                   ),
                   16.height,
@@ -81,8 +82,8 @@ class SchedulesPageView extends GetView<SchedulesPageController> {
                       return const Center(child: CircularProgressIndicator());
                     }
                     if (controller.teams.isEmpty) {
-                      return const Center(
-                        child: Text("No Teams Found"),
+                      return Center(
+                        child: Text(AppLocalizations.of(context)!.noTeamsFound),
                       );
                     }
                     return DropdownButton<TeamsModel>(
@@ -141,7 +142,7 @@ class SchedulesPageView extends GetView<SchedulesPageController> {
               GradientButton(
                 padding: const EdgeInsets.all(16.0),
                 onPressed: controller.add_schedule,
-                label: "Add Schedule",
+                label: AppLocalizations.of(context)!.addSchedule,
               ),
             ],
           ),

@@ -8,6 +8,8 @@ import 'package:ama/utils/app_extensions.dart';
 import 'package:ama/utils/theme/app_colors.dart';
 import 'package:ama/utils/theme/app_theme.dart';
 
+import '../l10n/app_localizations.dart';
+
 class LeaveActivityCard extends StatelessWidget {
   final LeaveActivityModel item;
   final void Function(LeaveActivityState state)? approveRejectTap;
@@ -37,7 +39,7 @@ class LeaveActivityCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Date",
+                    AppLocalizations.of(context)!.date,
                     style: Get.textTheme.bodyLarge,
                   ),
                   5.height,

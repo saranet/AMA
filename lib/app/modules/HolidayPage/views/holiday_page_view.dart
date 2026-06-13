@@ -11,6 +11,7 @@ import 'package:ama/widgets/app_button.dart';
 import 'package:ama/widgets/app_textfield.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../controllers/holiday_page_controller.dart';
 
 class HolidayPageView extends GetView<HolidayPageController> {
@@ -20,7 +21,7 @@ class HolidayPageView extends GetView<HolidayPageController> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.kWhite,
-        title: const Text('Holidays'),
+        title: Text(AppLocalizations.of(context)!.holidays),
       ),
       floatingActionButton: _buildAddHolidayWidget(context),
       body: Obx(() {
@@ -29,9 +30,9 @@ class HolidayPageView extends GetView<HolidayPageController> {
             child: CircularProgressIndicator(),
           );
         } else if (controller.allHolidays.isEmpty) {
-          return const Center(
+          return Center(
             child: Text(
-              'No Holliday found.',
+              AppLocalizations.of(context)!.noHollidayFound,
               style: TextStyle(fontSize: 20),
             ),
           );
@@ -62,7 +63,7 @@ class HolidayPageView extends GetView<HolidayPageController> {
                 content: Column(
                   children: [
                     AppTextField(
-                      hintText: "Label",
+                      hintText: AppLocalizations.of(context)!.label,
                       onChanged: (val) => label = val,
                     ),
                     24.height,

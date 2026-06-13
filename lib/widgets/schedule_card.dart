@@ -5,6 +5,8 @@ import 'package:ama/utils/app_extensions.dart';
 import 'package:ama/utils/theme/app_colors.dart';
 import 'package:ama/utils/theme/app_theme.dart';
 
+import '../l10n/app_localizations.dart';
+
 class ScheduleCard extends StatelessWidget {
   final ScheduleModel schedule;
 
@@ -40,9 +42,11 @@ class ScheduleCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Assigned Users:",
+                  Text(AppLocalizations.of(context)!.assignedUsers,
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   ...schedule.usersName!.map((u) => Text("- $u")),
+                  /*...schedule.usersName!
+                      .map((u) => Text(AppLocalizations.of(context)!.u)),*/
                 ],
               ),
 
@@ -60,7 +64,7 @@ class ScheduleCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Working Days:",
+                  Text(AppLocalizations.of(context)!.workingDays,
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   Wrap(
                     spacing: 8,

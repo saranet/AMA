@@ -10,9 +10,15 @@ import 'package:ama/data/controllers/app_storage_service.dart';
 import 'package:ama/utils/app_extensions.dart';
 import 'package:ama/utils/helper_function.dart';
 
+import '../../../../l10n/app_localizations.dart';
+
 class HolidayPageController extends GetxController {
   var allHolidays = <HolidayModel>[].obs;
   var isLloading = true.obs;
+
+  // Shortcut to access translations anywhere in this controller
+  AppLocalizations get l10n => AppLocalizations.of(Get.context!)!;
+
   @override
   void onInit() {
     super.onInit();
@@ -78,7 +84,7 @@ class HolidayPageController extends GetxController {
         showErrorSnack(resp.toString());
       }
     } else {
-      showErrorSnack("Super Admin can only add this");
+      showErrorSnack(l10n.superAdminCanOnlyAddThis);
     }
   }
 
@@ -86,11 +92,11 @@ class HolidayPageController extends GetxController {
     if (AppStorageController.to.currentUser?.roleType ==
         UserRoleType.superAdmin) {
       Get.defaultDialog(
-        title: "Delete",
-        content: const Text("Are you sure you want to delete this?"),
-        textCancel: "No",
+        title: l10n.delete,
+        content: Text(l10n.areYouSureYouWantToDeleteThis),
+        textCancel: l10n.no,
         onCancel: closeDialogs,
-        textConfirm: "Yes",
+        textConfirm: l10n.yes,
         onConfirm: () async {
           final resp = await ApiController.to.callPOSTAPI(
             url: APIUrlsService.to.deleteHoliday,
@@ -113,7 +119,7 @@ class HolidayPageController extends GetxController {
         },
       );
     } else {
-      showErrorSnack("Super Admin can only delete this");
+      showErrorSnack(l10n.superAdminCanOnlyDeleteThis);
     }
   }
 }

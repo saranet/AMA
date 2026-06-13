@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../controllers/auth_controller.dart';
 
 class AuthView extends GetView<AuthController> {
@@ -10,12 +11,12 @@ class AuthView extends GetView<AuthController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('AuthView'),
+        title: Text(AppLocalizations.of(context)!.authview),
         centerTitle: true,
       ),
-      body: const Center(
+      body: Center(
         child: Text(
-          'AuthView is working',
+          AppLocalizations.of(context)!.authviewIsWorking,
           style: TextStyle(fontSize: 20),
         ),
       ),

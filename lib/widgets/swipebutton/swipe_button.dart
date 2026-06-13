@@ -133,6 +133,9 @@ class _SwipeState extends State<SwipeButton> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  // ✅ Returns true if the app is currently in Right-To-Left mode (Arabic/Hebrew)
+  bool get _isRTL => Directionality.of(context) == TextDirection.rtl;
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -197,39 +200,47 @@ class _SwipeState extends State<SwipeButton> with TickerProviderStateMixin {
     return AnimatedBuilder(
       animation: swipeAnimationController,
       builder: (context, child) {
-        return Transform(
-          transform: Matrix4.identity()
-            ..translate(swipeAnimationController.value *
-                (constraints.maxWidth - widget.height)),
-          child: Container(
-            padding: widget.thumbPadding,
-            child: GestureDetector(
-              onHorizontalDragStart: _onHorizontalDragStart,
-              onHorizontalDragUpdate: (details) =>
-                  _onHorizontalDragUpdate(details, constraints.maxWidth),
-              onHorizontalDragEnd: _onHorizontalDragEnd,
-              child: Material(
-                elevation: elevationThumb,
-                borderRadius: borderRadius,
-                color: thumbColor,
-                clipBehavior: Clip.antiAlias,
-                child: AnimatedBuilder(
-                  animation: expandAnimationController,
-                  builder: (context, child) {
-                    return SizedBox(
-                      width: widget.height +
-                          (expandAnimationController.value *
-                              (constraints.maxWidth - widget.height)) -
-                          widget.thumbPadding.horizontal,
-                      height: widget.height - widget.thumbPadding.vertical,
-                      child: widget.thumb ??
-                          Icon(
-                            Icons.arrow_forward,
-                            color: widget.activeTrackColor ??
-                                widget.inactiveTrackColor,
-                          ),
-                    );
-                  },
+        // ✅ In RTL, start from right side and move left (negative translation)
+        final translateX = swipeAnimationController.value *
+            (constraints.maxWidth - widget.height) *
+            (_isRTL ? -1 : 1);
+
+        return Align(
+          // ✅ Align thumb to start (left in LTR, right in RTL)
+          alignment: _isRTL ? Alignment.centerRight : Alignment.centerLeft,
+          child: Transform.translate(
+            offset: Offset(translateX, 0),
+            child: Container(
+              padding: widget.thumbPadding,
+              child: GestureDetector(
+                onHorizontalDragStart: _onHorizontalDragStart,
+                onHorizontalDragUpdate: (details) =>
+                    _onHorizontalDragUpdate(details, constraints.maxWidth),
+                onHorizontalDragEnd: _onHorizontalDragEnd,
+                child: Material(
+                  elevation: elevationThumb,
+                  borderRadius: borderRadius,
+                  color: thumbColor,
+                  clipBehavior: Clip.antiAlias,
+                  child: AnimatedBuilder(
+                    animation: expandAnimationController,
+                    builder: (context, child) {
+                      return SizedBox(
+                        width: widget.height +
+                            (expandAnimationController.value *
+                                (constraints.maxWidth - widget.height)) -
+                            widget.thumbPadding.horizontal,
+                        height: widget.height - widget.thumbPadding.vertical,
+                        child: widget.thumb ??
+                            Icon(
+                              // ✅ Arrow points the right direction
+                              _isRTL ? Icons.arrow_back : Icons.arrow_forward,
+                              color: widget.activeTrackColor ??
+                                  widget.inactiveTrackColor,
+                            ),
+                      );
+                    },
+                  ),
                 ),
               ),
             ),
@@ -247,12 +258,14 @@ class _SwipeState extends State<SwipeButton> with TickerProviderStateMixin {
   }
 
   _onHorizontalDragUpdate(DragUpdateDetails details, double width) {
+    // ✅ In RTL, swipe direction is reversed (user swipes left, we count as progress)
+    final delta = details.primaryDelta! * (_isRTL ? -1 : 1);
+
     switch (widget._swipeButtonType) {
       case _SwipeButtonType.swipe:
         if (!swiped && widget.enabled) {
-          swipeAnimationController.value +=
-              details.primaryDelta! / (width - widget.height);
-          if (swipeAnimationController.value == 1) {
+          swipeAnimationController.value += delta / (width - widget.height);
+          if (swipeAnimationController.value >= 1.0) {
             setState(() {
               swiped = true;
               widget.onSwipe?.call();
@@ -262,9 +275,8 @@ class _SwipeState extends State<SwipeButton> with TickerProviderStateMixin {
         break;
       case _SwipeButtonType.expand:
         if (!swiped && widget.enabled) {
-          expandAnimationController.value +=
-              details.primaryDelta! / (width - widget.height);
-          if (expandAnimationController.value == 1) {
+          expandAnimationController.value += delta / (width - widget.height);
+          if (expandAnimationController.value >= 1.0) {
             setState(() {
               swiped = true;
               widget.onSwipe?.call();

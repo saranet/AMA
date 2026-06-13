@@ -9,6 +9,8 @@ import 'package:ama/utils/app_extensions.dart';
 import 'package:ama/utils/helper_function.dart';
 import 'package:ama/widgets/app_textfield.dart';
 
+import '../../../../l10n/app_localizations.dart';
+
 class LeavePageController extends GetxController {
   var tabSelected = Rxn(LeaveActivityState.pending);
   var leaveActivities = <LeaveActivityModel>[].obs;
@@ -20,6 +22,10 @@ class LeavePageController extends GetxController {
   var isTeamLoading = true.obs;
   var teams = <TeamsModel>[];
   TeamsModel? selectedTeam;
+
+  // Shortcut to access translations anywhere in this controller
+  AppLocalizations get l10n => AppLocalizations.of(Get.context!)!;
+
   @override
   void onInit() {
     super.onInit();
@@ -32,7 +38,6 @@ class LeavePageController extends GetxController {
   }
 
   void onTabChange(LeaveActivityState newState) {
-    // if (newState == tabSelected.value) return;
     leaveActivities.clear();
     leaveActivities
         .addAll(mainList.where((element) => element.leaveStatus == newState));
@@ -143,17 +148,17 @@ class LeavePageController extends GetxController {
     if (status == LeaveActivityState.rejected) {
       String rejectReason = "";
       Get.defaultDialog<void>(
-        title: "Reject",
+        title: l10n.reject,
         content: AppTextField(
-          hintText: "enter reject reason",
+          hintText: l10n.enterRejectReason,
           onChanged: (a) => rejectReason = a,
         ),
-        textCancel: "Cancel",
-        textConfirm: "Update",
+        textCancel: l10n.cancel,
+        textConfirm: l10n.update,
         onCancel: closeDialogs,
         onConfirm: () {
           if (rejectReason.trim().isEmpty) {
-            showErrorSnack("Enter reject reason");
+            showErrorSnack(l10n.enterRejectReason);
             return;
           }
           closeDialogs();

@@ -227,9 +227,9 @@ class HomePageView extends GetView<HomePageController> {
           Obx(() {
             final actions = controller.userPerformActivties;
             final isToday = controller.selectedDate.value.year ==
-                    controller.now.year &&
-                controller.selectedDate.value.month == controller.now.month &&
-                controller.selectedDate.value.day == controller.now.day;
+                    ServerTime.now.year &&
+                controller.selectedDate.value.month == ServerTime.now.month &&
+                controller.selectedDate.value.day == ServerTime.now.day;
 
             if (!isToday || actions.isEmpty) {
               return const SizedBox();

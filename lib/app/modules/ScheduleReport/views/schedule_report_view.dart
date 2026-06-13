@@ -12,6 +12,7 @@ import 'package:ama/widgets/leave_activity_card.dart';
 
 import 'package:get/get.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../controllers/schedule_report_controller.dart';
 
 class ScheduleReportView extends GetView<ScheduleReportController> {
@@ -21,7 +22,7 @@ class ScheduleReportView extends GetView<ScheduleReportController> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: AppColors.kWhite,
-          title: const Text("All Schedules"),
+          title: Text(AppLocalizations.of(context)!.allSchedules),
           actions: [
             IconButton.outlined(
               onPressed: controller.getAllSchedules,
@@ -66,7 +67,9 @@ class ScheduleReportView extends GetView<ScheduleReportController> {
                       controller.scheduleModel; // RxList<ScheduleModel>
 
                   if (schedules.isEmpty) {
-                    return const Center(child: Text("No schedules found"));
+                    return Center(
+                        child: Text(
+                            AppLocalizations.of(context)!.noSchedulesFound));
                   }
 
                   return Column(
@@ -74,9 +77,9 @@ class ScheduleReportView extends GetView<ScheduleReportController> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: (controller.myData.value)
-                            ? Text("My Schedule",
+                            ? Text(AppLocalizations.of(context)!.mySchedule,
                                 style: Get.textTheme.headlineSmall)
-                            : Text("Other Schedules",
+                            : Text(AppLocalizations.of(context)!.otherSchedules,
                                 style: Get.textTheme.headlineSmall),
                       ),
                       12.height,
@@ -136,9 +139,11 @@ class ScheduleReportView extends GetView<ScheduleReportController> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Assigned Users:",
+                      Text(AppLocalizations.of(context)!.assignedUsers,
                           style: TextStyle(fontWeight: FontWeight.bold)),
                       ...scheduleModel.usersName!.map((u) => Text("- $u")),
+                      /* ...scheduleModel.usersName!
+                          .map((u) => Text(AppLocalizations.of(context)!.u)),*/
                     ],
                   ),
 
@@ -170,7 +175,7 @@ class ScheduleReportView extends GetView<ScheduleReportController> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Working Days:",
+                      Text(AppLocalizations.of(context)!.workingDays,
                           style: TextStyle(fontWeight: FontWeight.bold)),
                       Wrap(
                         spacing: 8,

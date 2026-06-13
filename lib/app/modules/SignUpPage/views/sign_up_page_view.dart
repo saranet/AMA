@@ -16,6 +16,7 @@ import 'package:flutter/services.dart';
 
 import 'package:get/get.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../../utils/theme/app_colors.dart';
 import '../controllers/sign_up_page_controller.dart';
 
@@ -23,6 +24,7 @@ class SignUpPageView extends GetView<SignUpPageController> {
   const SignUpPageView({super.key});
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       body: SafeArea(
         child: Form(
@@ -32,18 +34,18 @@ class SignUpPageView extends GetView<SignUpPageController> {
             children: [
               24.height,
               Text(
-                "Register Account",
+                AppLocalizations.of(context)!.registerAccount,
                 style: Get.textTheme.headlineLarge,
               ),
               RichText(
                 text: TextSpan(
                   children: [
                     TextSpan(
-                      text: "to",
+                      text: l10n.to,
                       style: Get.textTheme.headlineLarge,
                     ),
                     TextSpan(
-                      text: " HR Attendance ",
+                      text: l10n.hrAttendance,
                       style: Get.textTheme.headlineLarge?.copyWith(
                         color: AppColors.kBlue900,
                       ),
@@ -53,18 +55,18 @@ class SignUpPageView extends GetView<SignUpPageController> {
               ),
               16.height,
               Text(
-                "Hello there, Sign Up to Continue",
+                AppLocalizations.of(context)!.helloThereSignUpToContinue,
                 style: Get.textTheme.bodyLarge?.copyWith(
                   color: AppColors.kGrey300,
                 ),
               ),
               16.height,
               AppTextField(
-                hintText: "Full Name",
+                hintText: AppLocalizations.of(context)!.fullName,
                 controller: controller.fullNameTc,
                 validator: (val) {
                   if (val?.isEmpty ?? true) {
-                    return "This field can't be empty";
+                    return l10n.thisFieldCantBeEmpty;
                   } else {
                     return null;
                   }
@@ -72,11 +74,11 @@ class SignUpPageView extends GetView<SignUpPageController> {
               ),
               16.height,
               AppTextField(
-                hintText: "Email Address",
+                hintText: AppLocalizations.of(context)!.emailAddress,
                 controller: controller.emailTc,
                 validator: (val) {
                   if (val?.isEmpty ?? true) {
-                    return "This field can't be empty";
+                    return l10n.thisFieldCantBeEmpty;
                   } else {
                     return null;
                   }
@@ -84,12 +86,12 @@ class SignUpPageView extends GetView<SignUpPageController> {
               ),
               16.height,
               AppTextField(
-                hintText: " Password",
+                hintText: l10n.password,
                 isPassword: true,
                 controller: controller.passwordTc,
                 validator: (val) {
                   if (val?.isEmpty ?? true) {
-                    return "This field can't be empty";
+                    return l10n.thisFieldCantBeEmpty;
                   } else {
                     return null;
                   }
@@ -98,11 +100,11 @@ class SignUpPageView extends GetView<SignUpPageController> {
               16.height,
               Obx(() {
                 if (controller.branches.isEmpty) {
-                  return const Text("No Branch Found");
+                  return Text(AppLocalizations.of(context)!.noBranchFound);
                 }
                 return DropdownButton<Branch>(
                   value: controller.selectedItem.value,
-                  hint: Text("Select Branch"),
+                  hint: Text(AppLocalizations.of(context)!.selectBranch),
                   items: controller.branches
                       .map((item) => DropdownMenuItem<Branch>(
                             value: item,
@@ -123,11 +125,11 @@ class SignUpPageView extends GetView<SignUpPageController> {
                   return const SizedBox(); // nothing before branch
                 }
                 if (controller.departments.isEmpty) {
-                  return const Text("No Department Found");
+                  return Text(AppLocalizations.of(context)!.noDepartmentFound);
                 }
                 return DropdownButton<Departments>(
                   value: controller.selectedDepartment.value,
-                  hint: Text("Select Department"),
+                  hint: Text(AppLocalizations.of(context)!.selectDepartment),
                   items: controller.departments
                       .map((item) => DropdownMenuItem<Departments>(
                             value: item,
@@ -153,8 +155,8 @@ class SignUpPageView extends GetView<SignUpPageController> {
                       controller.isEmployeeSignup.value = value,
                   title: Text(
                     controller.isEmployeeSignup.value
-                        ? "Employee SignUp"
-                        : "Admin SignUp",
+                        ? l10n.employeeSignUp
+                        : l10n.adminSignUp,
                     style: Get.textTheme.bodyLarge,
                   ),
                   controlAffinity: ListTileControlAffinity.leading,
@@ -171,7 +173,7 @@ class SignUpPageView extends GetView<SignUpPageController> {
                       title("Organization Details", Icons.people_alt_outlined),
                       16.height,
                       AppTextField(
-                        hintText: "Schedule Name",
+                        hintText: AppLocalizations.of(context)!.scheduleName,
                         controller: controller.scheduleNameTC,
                       ),
                       16.height,
@@ -237,7 +239,7 @@ class SignUpPageView extends GetView<SignUpPageController> {
                       ),
                       16.height,
                       AppTextField(
-                        hintText: "Per Month Paid Leave",
+                        hintText: AppLocalizations.of(context)!.perMonthPaidLeave,
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
                         ],
@@ -245,7 +247,7 @@ class SignUpPageView extends GetView<SignUpPageController> {
                       ),
                       16.height,
                       AppTextField(
-                        hintText: "Per Month Sick/Casual Leave",
+                        hintText: AppLocalizations.of(context)!.perMonthSickcasualLeave,
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
                         ],
@@ -253,7 +255,7 @@ class SignUpPageView extends GetView<SignUpPageController> {
                       ),
                       16.height,
                       AppTextField(
-                        hintText: "Per Month Work From Home",
+                        hintText: AppLocalizations.of(context)!.perMonthWorkFromHome,
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
                         ],
@@ -269,7 +271,7 @@ class SignUpPageView extends GetView<SignUpPageController> {
                   children: [
                     GradientButton(
                       onPressed: controller.signUP,
-                      label: "Signup",
+                      label: l10n.signUp,
                       isLoading: controller.isSaveLoading.value,
                     ),
                     16.height,
@@ -283,7 +285,8 @@ class SignUpPageView extends GetView<SignUpPageController> {
                           return Column(
                             children: [
                               Text(
-                                "You can login later with fingerprint",
+                                AppLocalizations.of(context)!
+                                    .youCanLoginLaterWithFingerprint,
                                 style: Get.textTheme.bodySmall,
                               ),
                               IconButton(
@@ -312,11 +315,11 @@ class SignUpPageView extends GetView<SignUpPageController> {
                   text: TextSpan(
                     children: [
                       TextSpan(
-                        text: "Do you have an account ? ",
+                        text: l10n.doyouHaveAnAccount,
                         style: Get.textTheme.bodySmall,
                       ),
                       TextSpan(
-                        text: " Login",
+                        text: l10n.logIn,
                         style: Get.textTheme.bodySmall?.copyWith(
                           color: AppColors.kBlue900,
                           fontWeight: AppFontWeight.bold,

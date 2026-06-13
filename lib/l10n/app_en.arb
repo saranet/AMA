@@ -1,235 +1,158 @@
 {
   "@@locale": "en",
-  "attendanceReport": "Attendance Report",
-  "@attendanceReport": {
-    "description": "From: all_employes_page_view.dart:28"
-  },
-  "departmentEmployeesList": "Department Employees List:",
-  "@departmentEmployeesList": {
-    "description": "From: all_employes_page_view.dart:59"
-  },
-  "noTeamsFound": "No Teams Found",
-  "@noTeamsFound": {
-    "description": "From: all_employes_page_view.dart:72"
-  },
-  "teamName": "Team Name",
-  "@teamName": {
-    "description": "From: all_employes_page_view.dart:97"
-  },
-  "fullName": "Full Name",
-  "@fullName": {
-    "description": "From: all_employes_page_view.dart:128"
-  },
-  "email": "Email",
-  "@email": {
-    "description": "From: all_employes_page_view.dart:133"
-  },
-  "applyLeave": "Apply Leave",
-  "@applyLeave": {
-    "description": "From: apply_leave_page_view.dart:24"
-  },
-  "selectLeaveType": "Select Leave Type",
-  "@selectLeaveType": {
-    "description": "From: apply_leave_page_view.dart:31"
-  },
-  "selectApprovalPerson": "Select Approval Person",
-  "@selectApprovalPerson": {
-    "description": "From: apply_leave_page_view.dart:80"
-  },
-  "noAdminMembersFound": "No Admin Members Found",
-  "@noAdminMembersFound": {
-    "description": "From: apply_leave_page_view.dart:86"
-  },
-  "reasonForLeave": "Reason for leave",
-  "@reasonForLeave": {
-    "description": "From: apply_leave_page_view.dart:76"
-  },
-  "userActivity": "User Activity",
-  "@userActivity": {
-    "description": "From: attend_report_view.dart:77"
-  },
-  "authview": "AuthView",
-  "@authview": {
-    "description": "From: auth_view.dart:13"
-  },
-  "authviewIsWorking": "AuthView is working",
-  "@authviewIsWorking": {
-    "description": "From: auth_view.dart:17"
-  },
-  "areYouSureYouWantToDeleteThis": "Are you sure you want to delete this?",
-  "@areYouSureYouWantToDeleteThis": {
-    "description": "From: holiday_page_controller.dart:90"
-  },
-  "holidays": "Holidays",
-  "@holidays": {
-    "description": "From: holiday_page_view.dart:23"
-  },
-  "noHollidayFound": "No Holliday found.",
-  "@noHollidayFound": {
-    "description": "From: holiday_page_view.dart:33"
-  },
-  "label": "Label",
-  "@label": {
-    "description": "From: holiday_page_view.dart:65"
-  },
-  "todayAttendence": "Today Attendence",
-  "@todayAttendence": {
-    "description": "From: home_page_view.dart:74"
-  },
-  "yourActivity": "Your Activity",
-  "@yourActivity": {
-    "description": "From: home_page_view.dart:223"
-  },
-  "enterRejectReason": "enter reject reason",
-  "@enterRejectReason": {
-    "description": "From: leave_page_controller.dart:148"
-  },
-  "allLeaves": "All Leaves",
-  "@allLeaves": {
-    "description": "From: leave_page_view.dart:20"
-  },
-  "noDataFound": "No Data found.",
-  "@noDataFound": {
-    "description": "From: leave_page_view.dart:151"
-  },
-  "enterNewPassword": "Enter new password",
-  "@enterNewPassword": {
-    "description": "From: login_page_controller.dart:106"
-  },
-  "reenterNewPassword": "Re-Enter new password",
-  "@reenterNewPassword": {
-    "description": "From: login_page_controller.dart:111"
-  },
-  "helloThereLoginToContinue": "Hello there, login to continue",
-  "@helloThereLoginToContinue": {
-    "description": "From: login_page_view.dart:34"
-  },
-  "orLoginWithFingerprint": "Or login with fingerprint",
-  "@orLoginWithFingerprint": {
-    "description": "From: login_page_view.dart:72"
-  },
-  "username": "Username",
-  "@username": {
-    "description": "From: login_page_view.dart:42"
-  },
+  "english": "English",
+  "arabic": "العربية",
   "password": "Password",
-  "@password": {
-    "description": "From: login_page_view.dart:47"
-  },
-  "loginWithFingerprint": "Login with Fingerprint",
-  "@loginWithFingerprint": {
-    "description": "From: login_page_view.dart:82"
-  },
-  "updateOrganization": "Update Organization",
-  "@updateOrganization": {
-    "description": "From: profile_page_view.dart:289"
-  },
-  "userName": "User Name",
-  "@userName": {
-    "description": "From: profile_page_view.dart:39"
-  },
-  "branchName": "Branch Name",
-  "@branchName": {
-    "description": "From: profile_page_view.dart:47"
-  },
-  "departmentName": "Department Name",
-  "@departmentName": {
-    "description": "From: profile_page_view.dart:55"
-  },
-  "enterOldPassword": "Enter Old password",
-  "@enterOldPassword": {
-    "description": "From: profile_page_view.dart:136"
-  },
-  "enterNewPassword_1": "enter new password",
-  "@enterNewPassword_1": {
-    "description": "From: profile_page_view.dart:141"
-  },
-  "organizationName": "Organization Name",
-  "@organizationName": {
-    "description": "From: profile_page_view.dart:218"
-  },
-  "allSchedules": "All Schedules",
-  "@allSchedules": {
-    "description": "From: schedule_report_view.dart:24"
-  },
-  "noSchedulesFound": "No schedules found",
-  "@noSchedulesFound": {
-    "description": "From: schedule_report_view.dart:69"
-  },
-  "mySchedule": "My Schedule",
-  "@mySchedule": {
-    "description": "From: schedule_report_view.dart:77"
-  },
-  "otherSchedules": "Other Schedules",
-  "@otherSchedules": {
-    "description": "From: schedule_report_view.dart:79"
-  },
-  "assignedUsers": "Assigned Users:",
-  "@assignedUsers": {
-    "description": "From: schedule_report_view.dart:139"
-  },
-  "u": "- $u",
-  "@u": {
-    "description": "From: schedule_report_view.dart:141"
-  },
-  "workingDays": "Working Days:",
-  "@workingDays": {
-    "description": "From: schedule_report_view.dart:173"
-  },
-  "addSchedule": "Add Schedule",
-  "@addSchedule": {
-    "description": "From: schedules_page_view.dart:30"
-  },
-  "scheduleName": "Schedule Name",
-  "@scheduleName": {
-    "description": "From: schedules_page_view.dart:49"
-  },
-  "registerAccount": "Register Account",
-  "@registerAccount": {
-    "description": "From: sign_up_page_view.dart:34"
-  },
-  "helloThereSignUpToContinue": "Hello there, Sign Up to Continue",
-  "@helloThereSignUpToContinue": {
-    "description": "From: sign_up_page_view.dart:55"
-  },
-  "noBranchFound": "No Branch Found",
-  "@noBranchFound": {
-    "description": "From: sign_up_page_view.dart:101"
-  },
-  "selectBranch": "Select Branch",
-  "@selectBranch": {
-    "description": "From: sign_up_page_view.dart:105"
-  },
-  "noDepartmentFound": "No Department Found",
-  "@noDepartmentFound": {
-    "description": "From: sign_up_page_view.dart:126"
-  },
-  "selectDepartment": "Select Department",
-  "@selectDepartment": {
-    "description": "From: sign_up_page_view.dart:130"
-  },
+  "username": "Username",
+  "fullName": "Full name",
+  "email": "Email",
+  "emailAddress": "Email address",
+
+  "logIn": "Log in",
+  "logOut": "Log out",
+  "signUp": "Sign up",
+  "userLogged": "User logged in",
+  "dontHaveAnAccount": "Don't have an account? ",
+  "doyouHaveAnAccount": "Do you have an account?",
+  "helloThereLoginToContinue": "Hello there, login to continue",
+  "helloThereSignUpToContinue": "Hello there, sign up to continue",
+  "registerAccount": "Register account",
+  "employeeSignUp": "Employee Sign Up",
+  "adminSignUp": "Admin Sign Up",
+
+  "loginWithFingerprint": "Login with fingerprint",
+  "orLoginWithFingerprint": "Or login with fingerprint",
   "youCanLoginLaterWithFingerprint": "You can login later with fingerprint",
-  "@youCanLoginLaterWithFingerprint": {
-    "description": "From: sign_up_page_view.dart:285"
-  },
-  "emailAddress": "Email Address",
-  "@emailAddress": {
-    "description": "From: sign_up_page_view.dart:75"
-  },
-  "perMonthPaidLeave": "Per Month Paid Leave",
-  "@perMonthPaidLeave": {
-    "description": "From: sign_up_page_view.dart:240"
-  },
-  "perMonthSickcasualLeave": "Per Month Sick/Casual Leave",
-  "@perMonthSickcasualLeave": {
-    "description": "From: sign_up_page_view.dart:248"
-  },
-  "perMonthWorkFromHome": "Per Month Work From Home",
-  "@perMonthWorkFromHome": {
-    "description": "From: sign_up_page_view.dart:256"
-  },
+
+  "setNewPassword": "Set new password",
+  "enterNewPassword": "Enter new password",
+  "enterNewPassword_1": "Enter new password again",
+  "enterOldPassword": "Enter old password",
+  "reenterNewPassword": "Re-enter new password",
+  "updatePassword": "Update password",
+  "passwordUpdated": "Password updated",
+  "passwordUpdatedSuccessfullyPleaseLoginAgain": "Password updated successfully. Please login again",
+  "pleaseEnterCorrectPassword": "Please enter correct password",
+  "pleaseEnterOldPasswordAndNewPassword": "Please enter old and new password",
+
+  "userDetails": "User details",
+  "userName": "User name",
+  "branchDetails": "Branch details",
+  "branchName": "Branch name",
+  "departmentDetails": "Department details",
+  "departmentName": "Department name",
+  "organizationDetails": "Organization details",
+  "organizationName": "Organization name",
+  "updateOrganization": "Update organization",
+
+  "hrAttendance": "HR Attendance",
+  "todayAttendence": "Today's Attendance",
+  "attendanceReport": "Attendance report",
+  "attendanceBlocked": "Attendance blocked",
+  "attendanceRecorded": "Attendance recorded",
+  "youAreOutsideAllowedAttendanceZone": "You are outside allowed attendance zone",
+
+  "checkIn": "Check In",
+  "checkOut": "Check Out",
+  "breakTime": "Break Time",
+  "totalDays": "Total Days",
+  "totalWorkingHours": "Total Working Hours",
+  "workingDays": "Working days",
+  "swipeToCheckIn": "Swipe to Check in",
+  "swipeToCheckOut": "Swipe to Check out",
+  "swipeToBreakIn": "Swipe to Break in",
+  "swipeToBreakOut": "Swipe to Break out",
+  "yourActivity": "Your activity",
+  "userActivity": "User activity",
+
+  "allLeaves": "All leaves",
+  "applyLeave": "Apply leave",
+  "leave": "Leave",
+  "paid": "Paid",
+  "casualSick": "Casual/Sick",
+  "wfh": "WFH",
+  "balance": "Balance",
+  "reasonForLeave": "Reason for leave",
+  "selectLeaveType": "Select leave type",
+  "selectApprovalPerson": "Select approval person",
+  "reject": "Reject",
+  "enterRejectReason": "Enter reject reason",
+  "update": "Update",
+
+  "allSchedules": "All schedules",
+  "mySchedule": "My schedule",
+  "otherSchedules": "Other schedules",
+  "addSchedule": "Add schedule",
+  "scheduleName": "Schedule name",
+  "noSchedulesFound": "No schedules found",
+
+  "holidays": "Holidays",
+  "noHollidayFound": "No holidays found",
+
+  "addTeam": "Add team",
+  "teamName": "Team name",
+  "addMember": "Add member",
+  "assignedUsers": "Assigned users",
+  "departmentEmployeesList": "Department employees list",
+  "noTeamsFound": "No teams found",
+  "noAdminMembersFound": "No admin members found",
+  "noBranchFound": "No branch found",
+  "noDepartmentFound": "No department found",
+  "selectBranch": "Select branch",
+  "selectDepartment": "Select department",
+
+  "selectStartTime": "Select start time",
+  "selectEndTime": "Select end time",
+  "selectStartDate": "Select start Date",
+  "selectEndDate": "Select end Date",
+  "perMonthPaidLeave": "Per month paid leave",
+  "perMonthSickcasualLeave": "Per month sick/casual leave",
+  "perMonthWorkFromHome": "Per month work from home",
+
   "date": "Date",
-  "@date": {
-    "description": "From: leave_activity_card.dart:39"
+  "label": "Label",
+  "to": "To",
+  "my": "My",
+  "other": "Other",
+  "yes": "Yes",
+  "no": "No",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "areYouSureYouWantToDeleteThis": "Are you sure you want to delete this?",
+  "superAdminCanOnlyAddThis": "Super admin can only add this",
+  "superAdminCanOnlyDeleteThis": "Super admin can only delete this",
+
+  "noDataFound": "No data found",
+  "thisFieldCantBeEmpty": "This field can't be empty",
+  "unknownError": "Unknown error",
+  "serverResponseError": "Server response error",
+  "networkApiErrorWhenSendingAttendance": "Network error when sending attendance",
+  "locationServicesAreDisabled": "Location services are disabled",
+  "locationPermissionDenied": "Location permission denied",
+  "locationPermissionPermanentlyDenied": "Location permission permanently denied",
+
+  "changeLanguage": "Change language",
+
+  "authview": "Auth View",
+  "authviewIsWorking": "Auth view is working",
+  "breakIn": "break In",
+  "breakOut": "break Out",
+  "msgLate": "Late",
+  "msgOnTime": "On Time",
+  "msgOverTime": "Over Time",
+  "msgEarly": "Early",
+  "msgEarlyCheckout": "Early Checkout",
+  "msgLate": "Late",
+  "msgOnTime": "On Time",
+  "msgOverTime": "Over Time",
+  "msgEarly": "Early",
+  "msgEarlyCheckout": "Early Checkout",
+  "pending": "Pending",
+  "approved": "Approved",
+  "rejected": "Rejected",
+  "submit":"submit",
+  "selectApprovalPersonAndReasonAndType": "Select approval person, enter leave reason and select leave type",
+"invalidResponseFromServer": "Invalid response from server",
+"noWorkingDaysConfigured": "No working days configured",
+"processing": "Processing..."
   }
-}
