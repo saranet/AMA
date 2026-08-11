@@ -1,0 +1,5 @@
+tags:
+  network:
+    # Hits the real API endpoint. Excluded from CI by default; run before every
+    # App Store submission with: flutter test test/api_reachability_test.dart
+    skip: false

@@ -9,14 +9,16 @@ class ApiController extends GetConnect {
       Get.isRegistered<ApiController>() ? Get.find() : Get.put(ApiController());
 
   // Configuration
-  static const Duration _timeout = Duration(seconds: 15);
+  /// Ceiling on any single request. Kept short so a stalled network surfaces
+  /// as an error the user can act on rather than a frozen-looking screen.
+  static const Duration requestTimeout = Duration(seconds: 15);
   static const int _maxRetries = 2;
   static const Duration _retryDelay = Duration(seconds: 1);
 
   @override
   void onInit() {
     httpClient.baseUrl = APIUrlsService.to.baseURL;
-    httpClient.timeout = _timeout;
+    httpClient.timeout = requestTimeout;
     super.onInit();
   }
 
@@ -40,7 +42,7 @@ class ApiController extends GetConnect {
       // GetConnect's own timeout covers connecting and sending, but not
       // reading the response body — that read can hang forever. Wrap the
       // whole call so no request can outlive its budget.
-      final resp = await get(Uri.encodeFull(url)).timeout(_timeout);
+      final resp = await get(Uri.encodeFull(url)).timeout(requestTimeout);
 
       if (resp.isOk) {
         if (resp.body is String) {
@@ -86,7 +88,7 @@ class ApiController extends GetConnect {
     int retryAttempt = 0,
   }) async {
     try {
-      final resp = await post(url, body).timeout(_timeout);
+      final resp = await post(url, body).timeout(requestTimeout);
 
       if (resp.isOk) {
         if (resp.body is String) {
