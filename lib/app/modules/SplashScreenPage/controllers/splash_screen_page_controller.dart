@@ -21,11 +21,20 @@ class SplashScreenPageController extends GetxController {
 
   String get appImageLogo => AppImages.appLogo;
 
+  /// Hard cap on how long the splash may wait for the server-time fetch.
+  /// ServerTime already defaults to UTC+3, so the fetch is an optimisation —
+  /// leaving the splash is never allowed to depend on the network succeeding.
+  static const Duration _serverTimeBudget = Duration(seconds: 3);
+
   checkUserIsLoggedIn() async {
-    await Future.wait([
-      _fetchServerTime(),
-      Future.delayed(const Duration(milliseconds: 1500)),
-    ]);
+    try {
+      await Future.wait([
+        _fetchServerTime().timeout(_serverTimeBudget, onTimeout: () {}),
+        Future.delayed(const Duration(milliseconds: 1500)),
+      ]);
+    } catch (_) {
+      // Never block the handoff to the login page on startup work.
+    }
     Get.offAllNamed(Routes.LOGIN_PAGE);
   }
 
