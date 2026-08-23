@@ -7,8 +7,7 @@ class APIUrlsService extends GetxService {
   // final String baseURL =
   //   "http://alprofict.com:8080/attend_api/"; //for App localhost
   //final String baseURL = "https://ama.deef.com:8232/"; // for web app localhost
-  final String baseURL =
-      "https://ama.deef.com:8233/attend_api/"; // for web app localhost
+  final String baseURL = "https://ama.deef.com:443/"; // for web app localhost
 
   final String serverTime = "server_time.php";
 

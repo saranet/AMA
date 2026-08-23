@@ -42,4 +42,4 @@ flutter_native_splash:
   ios: true
 name: ama
 publish_to: none
-version: 1.0.0+6
+version: 1.0.0+7
