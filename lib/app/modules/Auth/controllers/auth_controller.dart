@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:ama/app/modules/LoginPage/controllers/login_page_controller.dart';
+import 'package:android_id/android_id.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:uuid/uuid.dart';
 
 class AuthController extends GetxController {
   final LocalAuthentication auth = LocalAuthentication();
@@ -14,6 +16,8 @@ class AuthController extends GetxController {
 
   final _storage = const FlutterSecureStorage();
   var isLoggedIn = false.obs;
+
+  static const _deviceIdStorageKey = 'stable_device_id';
 
   String? _cachedDeviceId;
 
@@ -33,15 +37,40 @@ class AuthController extends GetxController {
   }
 
   Future<String> _fetchDeviceId() async {
-    final deviceInfo = DeviceInfoPlugin();
-    if (Platform.isAndroid) {
-      final androidInfo = await deviceInfo.androidInfo;
-      return androidInfo.id;
-    } else if (Platform.isIOS) {
-      final iosInfo = await deviceInfo.iosInfo;
-      return iosInfo.identifierForVendor ?? "unknown_ios";
+    // Reuse the persisted value so the id stays identical across app
+    // restarts and (on iOS, where Keychain data survives uninstall) across
+    // reinstalls of the app on the same physical device.
+    final stored = await _storage.read(key: _deviceIdStorageKey);
+    if (stored != null && stored.isNotEmpty) {
+      return stored;
     }
-    return "unknown_device";
+
+    String? resolvedId;
+    try {
+      if (Platform.isAndroid) {
+        // Settings.Secure.ANDROID_ID: unique per device + app signing key
+        // + user, stable across reinstalls, and reset by the OS on a
+        // factory reset. `device_info_plus`'s `androidInfo.id` is
+        // `Build.ID` (the OS build fingerprint), which is identical on
+        // every device running the same firmware image -- that mismatch
+        // is why unrelated devices were ending up with the same id.
+        resolvedId = await const AndroidId().getId();
+      } else if (Platform.isIOS) {
+        final iosInfo = await DeviceInfoPlugin().iosInfo;
+        resolvedId = iosInfo.identifierForVendor;
+      }
+    } catch (_) {
+      resolvedId = null;
+    }
+
+    // No shared placeholder strings: if the OS id is unavailable, generate
+    // a random id instead of a hardcoded fallback, so devices that hit
+    // this path never collide with each other.
+    final deviceId =
+        (resolvedId == null || resolvedId.isEmpty) ? const Uuid().v4() : resolvedId;
+
+    await _storage.write(key: _deviceIdStorageKey, value: deviceId);
+    return deviceId;
   }
 
   Future<void> checkBiometricSupport() async {
