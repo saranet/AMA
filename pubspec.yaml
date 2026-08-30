@@ -1,6 +1,6 @@
 ---
 dependencies:
-  android_id: ^0.5.2+1
+  android_id: ^0.4.0
   animated_bottom_navigation_bar: ^1.4.0
   cupertino_icons: ^1.0.8
   device_info_plus: ^10.0.0
